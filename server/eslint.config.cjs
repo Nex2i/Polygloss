@@ -1,11 +1,12 @@
-import js from '@eslint/js';
-import typescript from '@typescript-eslint/eslint-plugin';
-import parser from '@typescript-eslint/parser';
-import prettier from 'eslint-plugin-prettier';
-import importPlugin from 'eslint-plugin-import';
-import unusedImports from 'eslint-plugin-unused-imports';
+const js = require('@eslint/js');
+const typescript = require('@typescript-eslint/eslint-plugin');
+const parser = require('@typescript-eslint/parser');
+const prettier = require('eslint-plugin-prettier');
+const importPlugin = require('eslint-plugin-import');
+const unusedImports = require('eslint-plugin-unused-imports');
 
-export default [
+/** @type {import("eslint").Linter.FlatConfig[]} */
+module.exports = [
   {
     ignores: ['**/*.css', '**/*.scss', 'node_modules/*'],
   },
