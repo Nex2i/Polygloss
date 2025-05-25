@@ -1,24 +1,24 @@
-import pino, { Logger, LoggerOptions } from "pino";
+import pino, { Logger, LoggerOptions } from 'pino';
 
 const loggerOptions: LoggerOptions = {
   transport: {
-    target: "pino-pretty",
+    target: 'pino-pretty',
     options: {
       translateTime: true,
-      ignore: "pid,hostname",
+      ignore: 'pid,hostname',
       levelFirst: true,
       prettifier: true,
       useLevelLabels: true,
-      levelKey: "level",
+      levelKey: 'level',
     },
   },
-  level: "warn",
+  level: 'warn',
 };
 
 export const baseLogger = pino(loggerOptions);
 
 const formatArg = (arg: any): any => {
-  if (arg && typeof arg === "object" && !Array.isArray(arg)) {
+  if (arg && typeof arg === 'object' && !Array.isArray(arg)) {
     const formattedObject: any = {};
     for (const [key, value] of Object.entries(arg)) {
       formattedObject[key] = formatArg(value);
@@ -34,7 +34,7 @@ const createLoggerWithOverride = (logger: Logger) => {
       logger.warn({ payload: formatArg(arg), ...args }, message);
     },
     info: (message: string, arg?: any) => {
-      console.log(message, arg ? formatArg(arg) : "");
+      console.log(message, arg ? formatArg(arg) : '');
       logger.info({ payload: formatArg(arg) }, message);
     },
     error: (message: string, arg?: any, ...args: any[]) => {

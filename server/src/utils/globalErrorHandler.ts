@@ -10,7 +10,7 @@ export function globalErrorHandler(
   try {
     const status: number = error.statusCode ?? 500;
     const message: string =
-      status === 500 ? defaultErrorMessage : error.message ?? defaultErrorMessage;
+      status === 500 ? defaultErrorMessage : (error.message ?? defaultErrorMessage);
 
     logger.error(
       `[${request.method}] ${request.url} >> StatusCode:: ${status}, Message:: ${message}`,

@@ -1,13 +1,13 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
-import fastifyPlugin from "fastify-plugin";
-import { ForbiddenError } from "@/exceptions/error";
-import { logger } from "@/libs/logger";
+import { FastifyInstance, FastifyRequest } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
+import { ForbiddenError } from '@/exceptions/error';
+import { logger } from '@/libs/logger';
 
 export default fastifyPlugin(async (fastify: FastifyInstance) => {
   const authPrehandler = async (request: FastifyRequest) => {
     try {
-      if (!request.headers?.authorization?.includes("Bearer")) {
-        throw new ForbiddenError("No Authorization Header");
+      if (!request.headers?.authorization?.includes('Bearer')) {
+        throw new ForbiddenError('No Authorization Header');
       }
 
       const payload = (await request.jwtVerify()) as { user: object };
@@ -21,9 +21,9 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
       };
       logger.warn(`authPrehandler Error: `, errorPayload);
 
-      throw new ForbiddenError("Invalid Token");
+      throw new ForbiddenError('Invalid Token');
     }
   };
 
-  fastify.decorate("authPrehandler", authPrehandler);
+  fastify.decorate('authPrehandler', authPrehandler);
 });

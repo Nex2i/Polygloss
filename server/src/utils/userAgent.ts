@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+import { FastifyRequest } from 'fastify';
 
 export interface UserAgent {
   deviceType: string;
@@ -7,30 +7,30 @@ export interface UserAgent {
 }
 
 export function getUserAgentFromRequest(request: FastifyRequest): UserAgent {
-  const userAgent = request.headers["user-agent"] || "";
+  const userAgent = request.headers['user-agent'] || '';
   const sessionIpAddress = request.ip;
 
-  let deviceType = "Unknown";
-  let operatingSystem = "Unknown";
+  let deviceType = 'Unknown';
+  let operatingSystem = 'Unknown';
 
   if (/mobile/i.test(userAgent)) {
-    deviceType = "Mobile";
+    deviceType = 'Mobile';
   } else if (/tablet/i.test(userAgent)) {
-    deviceType = "Tablet";
+    deviceType = 'Tablet';
   } else {
-    deviceType = "Desktop";
+    deviceType = 'Desktop';
   }
 
   if (/windows/i.test(userAgent)) {
-    operatingSystem = "Windows";
+    operatingSystem = 'Windows';
   } else if (/mac os|macos/i.test(userAgent)) {
-    operatingSystem = "MacOS";
+    operatingSystem = 'MacOS';
   } else if (/android/i.test(userAgent)) {
-    operatingSystem = "Android";
+    operatingSystem = 'Android';
   } else if (/linux/i.test(userAgent)) {
-    operatingSystem = "Linux";
+    operatingSystem = 'Linux';
   } else if (/iphone|ipad|ipod/i.test(userAgent)) {
-    operatingSystem = "iOS";
+    operatingSystem = 'iOS';
   }
 
   return {

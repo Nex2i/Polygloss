@@ -1,20 +1,17 @@
-import { FastifyInstance, RouteOptions } from "fastify";
-import { HttpMethods } from "@/utils/HttpMethods";
+import { FastifyInstance, RouteOptions } from 'fastify';
+import { HttpMethods } from '@/utils/HttpMethods';
 
-const basePath = "/auth";
+const basePath = '/auth';
 
-export default async function Authentication(
-  fastify: FastifyInstance,
-  _opts: RouteOptions
-) {
+export default async function Authentication(fastify: FastifyInstance, _opts: RouteOptions) {
   fastify.route({
     method: HttpMethods.POST,
     url: `${basePath}/login`,
     handler: () => {},
     schema: {
-      tags: ["Authentication"],
-      summary: "Login",
-      description: "Authenticate a user and return a JWT.",
+      tags: ['Authentication'],
+      summary: 'Login',
+      description: 'Authenticate a user and return a JWT.',
     },
   });
 
@@ -24,9 +21,9 @@ export default async function Authentication(
     handler: () => {},
     preHandler: [fastify.authPrehandler],
     schema: {
-      tags: ["Authentication"],
-      summary: "Logout",
-      description: "Logout a user.",
+      tags: ['Authentication'],
+      summary: 'Logout',
+      description: 'Logout a user.',
     },
   });
 
@@ -36,9 +33,9 @@ export default async function Authentication(
     handler: () => {},
     preHandler: [fastify.authPrehandler],
     schema: {
-      tags: ["Authentication"],
-      summary: "Get Auth Info",
-      description: "Get authentication info for the current user.",
+      tags: ['Authentication'],
+      summary: 'Get Auth Info',
+      description: 'Get authentication info for the current user.',
     },
   });
 
@@ -48,9 +45,9 @@ export default async function Authentication(
     handler: () => {},
     preHandler: [fastify.authPrehandler],
     schema: {
-      tags: ["Authentication"],
-      summary: "Delete User",
-      description: "Delete a user by userId.",
+      tags: ['Authentication'],
+      summary: 'Delete User',
+      description: 'Delete a user by userId.',
     },
   });
 }
