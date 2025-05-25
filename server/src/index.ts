@@ -1,24 +1,39 @@
-import cluster from 'cluster';
-import os from 'os';
 import App from './app';
+import { Server as SocketIOServer } from 'socket.io';
+import { PORT } from './config';
+import { getNetworkAddress } from './utils/network';
+import { logger } from './libs/logger';
 
-const isClusterEnabled = false;
-
-if (cluster.isPrimary && isClusterEnabled) {
-  const numCPUs = os.cpus().length;
-
-  console.log(`Master ${process.pid} is running`);
-
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
-
-  cluster.on('exit', (worker, _code, _signal) => {
-    console.log(`Worker ${worker.process.pid} died, restarting...`);
-    cluster.fork();
++(async () => {
+  const { httpServer } = await App();
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+    },
+    path: '/api/chat',
   });
-} else {
-  // This will start your Fastify server on each worker
-  App();
-}
+
+  io.on('connection', (socket) => {
+    logger.info('Socket.io client connected');
+    socket.on('chat message', (msg) => {
+      // Echo the message back to the sender (or broadcast as needed)
+      const message = {
+        content: msg.content,
+        timestamp: new Date().toISOString(),
+        senderId: 'SYSTEM_USER',
+      };
+      socket.emit('chat message', message);
+    });
+    socket.on('disconnect', () => {
+      logger.info('Socket.io client disconnected');
+    });
+  });
+
+  httpServer.listen(Number(PORT) || 3000, '0.0.0.0', () => {
+    const networkAddress = getNetworkAddress();
+    logger.info(
+      `Server running on port ${PORT} \nLocal: http://localhost:${PORT} \nNetwork: http://${networkAddress}:${PORT}`
+    );
+  });
+})();

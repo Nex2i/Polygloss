@@ -12,7 +12,8 @@ import { schema } from '@/utils/validateEnv';
 import '@/extensions';
 import { logger } from '@/libs/logger';
 import { globalErrorHandler } from '@/utils/globalErrorHandler';
-import { getNetworkAddress } from '@/utils/network';
+import { createServer } from 'http';
+import '@fastify/websocket';
 
 const port: number = Number(PORT);
 
@@ -57,21 +58,11 @@ async function startServer() {
     options: { prefix: `/api` },
   });
 
-  // Start listening
-  try {
-    await app.listen({ port, host: '0.0.0.0' });
+  // Create HTTP server and attach Fastify
+  const httpServer = createServer(app.server);
 
-    const networkAddress = getNetworkAddress();
-    logger.info(
-      `Server running on port ${port} \nLocal: http://localhost:${port} \nNetwork: http://${networkAddress}:${port}`
-    );
-  } catch (err) {
-    logger.error('APP ERROR', err);
-    // dbClient.$disconnect();
-    process.exit(1);
-  }
-
-  return app;
+  // Return both app and httpServer for socket.io integration
+  return { app, httpServer };
 }
 
 export default startServer;
