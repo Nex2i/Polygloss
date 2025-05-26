@@ -11,10 +11,17 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TrainingchatImport } from './routes/trainingchat'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AuthImport } from './routes/auth'
 
 // Create/Update Routes
+
+const TrainingchatRoute = TrainingchatImport.update({
+  id: '/trainingchat',
+  path: '/trainingchat',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const DashboardRoute = DashboardImport.update({
   id: '/dashboard',
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
     }
+    '/trainingchat': {
+      id: '/trainingchat'
+      path: '/trainingchat'
+      fullPath: '/trainingchat'
+      preLoaderRoute: typeof TrainingchatImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/trainingchat': typeof TrainingchatRoute
 }
 
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/trainingchat': typeof TrainingchatRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/trainingchat': typeof TrainingchatRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/dashboard'
+  fullPaths: '/auth' | '/dashboard' | '/trainingchat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/dashboard'
-  id: '__root__' | '/auth' | '/dashboard'
+  to: '/auth' | '/dashboard' | '/trainingchat'
+  id: '__root__' | '/auth' | '/dashboard' | '/trainingchat'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  TrainingchatRoute: typeof TrainingchatRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  TrainingchatRoute: TrainingchatRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/auth",
-        "/dashboard"
+        "/dashboard",
+        "/trainingchat"
       ]
     },
     "/auth": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/dashboard": {
       "filePath": "dashboard.tsx"
+    },
+    "/trainingchat": {
+      "filePath": "trainingchat.tsx"
     }
   }
 }

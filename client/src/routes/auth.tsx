@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/auth')({
   component: Login,
@@ -7,6 +7,13 @@ export const Route = createFileRoute('/auth')({
 
 function Login() {
   const [username, setUsername] = useState('');
+  const router = useRouter();
+
+  const handleStartChatting = () => {
+    // In a real app, you would handle authentication here
+    // For now, we'll just navigate to the dashboard
+    router.navigate({ to: '/dashboard' });
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f9fb] flex flex-col items-center justify-between px-2 py-8">
@@ -25,6 +32,7 @@ function Login() {
       <button
         className="w-full max-w-[700px] text-2xl sm:text-3xl px-0 py-5 rounded-xl bg-[#0d7aff] text-white font-bold border-none mb-4 mt-0 disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
         disabled={!username.trim()}
+        onClick={handleStartChatting}
       >
         Start chatting
       </button>
