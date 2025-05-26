@@ -17,17 +17,23 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <h2>Dashboard Page</h2>
-      <button onClick={handleClick} disabled={isLoading || isFetching}>
-        Ping API
-      </button>
-      <div style={{ marginTop: 16 }}>
-        {isLoading || isFetching ? 'Loading...' : null}
-        {error ? <span style={{ color: 'red' }}>Error: {error.message}</span> : null}
-        {data && data.message ? <span>Response: {data.message}</span> : null}
+    <div className="flex flex-col h-screen max-h-screen">
+      <div className="shrink-0 p-4 bg-white/80 backdrop-blur border-b border-gray-200 z-10">
+        <h2 className="text-2xl font-bold mb-2">Dashboard Page</h2>
+        <button
+          onClick={handleClick}
+          disabled={isLoading || isFetching}
+          className="px-4 py-2 rounded bg-blue-600 text-white font-medium disabled:bg-gray-300 disabled:text-gray-500 mr-2"
+        >
+          Ping API
+        </button>
+        {isLoading || isFetching ? <span className="ml-2 text-gray-500">Loading...</span> : null}
+        {error ? <span className="ml-2 text-red-500">Error: {error.message}</span> : null}
+        {data && data.message ? (
+          <span className="ml-2 text-green-600">Response: {data.message}</span>
+        ) : null}
       </div>
-      <div style={{ marginTop: 32 }}>
+      <div className="flex-1 min-h-0">
         <Chat />
       </div>
     </div>
