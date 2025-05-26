@@ -7,7 +7,7 @@ export default async function Chat(fastify: FastifyInstance, _opts: RouteOptions
   // Optionally, keep a health check route for /chat
   fastify.route({
     method: HttpMethods.GET,
-    url: `/chat`,
+    url: `${basePath}`,
     handler: (_req: FastifyRequest, reply: FastifyReply) => {
       return reply.status(200).send({ message: 'Chat socket.io endpoint is available.' });
     },

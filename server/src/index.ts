@@ -1,5 +1,5 @@
-import App from './app';
 import { Server as SocketIOServer } from 'socket.io';
+import App from './app';
 import { PORT } from './config';
 import { getNetworkAddress } from './utils/network';
 import { logger } from './libs/logger';

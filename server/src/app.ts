@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { createServer } from 'http';
 import Fastify from 'fastify';
 import AutoLoad from '@fastify/autoload';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
@@ -7,15 +8,12 @@ import fastifyEnv from '@fastify/env';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyJwt from '@fastify/jwt';
 import { schemaErrorFormatter } from '@/utils/schemaErrorFormatter';
-import { CREDENTIALS, PORT, SECRET_KEY } from '@/config';
+import { CREDENTIALS, SECRET_KEY } from '@/config';
 import { schema } from '@/utils/validateEnv';
 import '@/extensions';
 import { logger } from '@/libs/logger';
 import { globalErrorHandler } from '@/utils/globalErrorHandler';
-import { createServer } from 'http';
 import '@fastify/websocket';
-
-const port: number = Number(PORT);
 
 async function startServer() {
   const app = Fastify({
