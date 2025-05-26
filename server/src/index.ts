@@ -8,8 +8,8 @@ dotenv.config();
 const PORT: number = Number(process.env.PORT || 3001);
 
 (async () => {
-  const { httpServer } = await App();
-  const io = new SocketIOServer(httpServer, {
+  const app = await App();
+  const io = new SocketIOServer(app.server, {
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
@@ -36,10 +36,10 @@ const PORT: number = Number(process.env.PORT || 3001);
   console.log('PORT from env:', process.env.PORT);
   console.log('PORT:', PORT);
 
-  httpServer.listen(Number(PORT), '0.0.0.0', () => {
+  app.listen({ port: Number(PORT), host: '0.0.0.0' }, () => {
     const networkAddress = getNetworkAddress();
     logger.info(
-      `Server running on port ${PORT} \nLocal: http://localhost:${PORT} \nNetwork: http://${networkAddress}:${PORT}`
+      `Server running on port ${PORT} \nLocal: https://localhost:${PORT} \nNetwork: https://${networkAddress}:${PORT}`
     );
   });
 })();

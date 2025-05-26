@@ -55,12 +55,7 @@ async function startServer() {
     options: { prefix: `/api` },
   });
 
-  // Create HTTP server and attach Fastify
-  console.log('APP: PORT from env:', process.env.PORT);
-  const httpServer = createServer(app.server);
-
-  // Return both app and httpServer for socket.io integration
-  return { app, httpServer };
+  return app;
 }
 
 export default startServer;
