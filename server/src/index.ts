@@ -30,7 +30,7 @@ import { logger } from './libs/logger';
     });
   });
 
-  httpServer.listen(Number(PORT) || 3000, '0.0.0.0', () => {
+  httpServer.listen(Number(PORT) || 3000, () => {
     const networkAddress = getNetworkAddress();
     logger.info(
       `Server running on port ${PORT} \nLocal: http://localhost:${PORT} \nNetwork: http://${networkAddress}:${PORT}`
