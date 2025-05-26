@@ -1,9 +1,11 @@
 import { Server as SocketIOServer } from 'socket.io';
+import dotenv from 'dotenv';
 import App from './app';
 import { getNetworkAddress } from './utils/network';
 import { logger } from './libs/logger';
 
-const PORT: number = Number(process.env.PORT) ?? 3001;
+dotenv.config();
+const PORT: number = Number(process.env.PORT || 3001);
 
 (async () => {
   const { httpServer } = await App();
