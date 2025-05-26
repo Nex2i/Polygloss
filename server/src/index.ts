@@ -4,7 +4,7 @@ import { PORT } from './config';
 import { getNetworkAddress } from './utils/network';
 import { logger } from './libs/logger';
 
-+(async () => {
+(async () => {
   const { httpServer } = await App();
   const io = new SocketIOServer(httpServer, {
     cors: {
