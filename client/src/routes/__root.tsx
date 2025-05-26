@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
-  component: () => {
+  component: function RootComponent() {
     const router = useRouter();
     if (typeof window !== 'undefined' && window.location.pathname === '/') {
       router.history.replace('/auth');
