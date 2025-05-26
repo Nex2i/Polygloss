@@ -1,4 +1,8 @@
+import { useRouter } from '@tanstack/react-router';
+
 const TrainingChat = () => {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Header */}
@@ -9,6 +13,7 @@ const TrainingChat = () => {
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          onClick={() => router.navigate({ to: '/dashboard' })}
         >
           <path
             strokeLinecap="round"
