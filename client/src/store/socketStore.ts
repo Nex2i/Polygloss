@@ -9,7 +9,14 @@ const SOCKET_PATH = '/api/chat';
 
 let socket: Socket | null = null;
 
-export function useSocketChat() {
+interface UseSocketChatResult {
+  connected: boolean;
+  messages: ChatMessage[];
+  sendMessage: (content: string) => void;
+  userId: string | null;
+}
+
+export function useSocketChat(): UseSocketChatResult {
   const dispatch = useAppDispatch();
   const connected = useAppSelector((state) => state.chat.connected);
   const messages = useAppSelector((state) => state.chat.messages);
