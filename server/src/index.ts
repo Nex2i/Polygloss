@@ -1,8 +1,9 @@
 import { Server as SocketIOServer } from 'socket.io';
 import App from './app';
-import { PORT } from './config';
 import { getNetworkAddress } from './utils/network';
 import { logger } from './libs/logger';
+
+const PORT: number = Number(process.env.PORT) ?? 3001;
 
 (async () => {
   const { httpServer } = await App();
@@ -29,6 +30,9 @@ import { logger } from './libs/logger';
       logger.info('Socket.io client disconnected');
     });
   });
+
+  console.log('PORT from env:', process.env.PORT);
+  console.log('PORT:', PORT);
 
   httpServer.listen(Number(PORT), '0.0.0.0', () => {
     const networkAddress = getNetworkAddress();
