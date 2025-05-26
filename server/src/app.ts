@@ -13,7 +13,6 @@ import { schema } from '@/utils/validateEnv';
 import '@/extensions';
 import { logger } from '@/libs/logger';
 import { globalErrorHandler } from '@/utils/globalErrorHandler';
-import '@fastify/websocket';
 
 async function startServer() {
   const app = Fastify({
