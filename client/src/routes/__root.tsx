@@ -1,15 +1,15 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
-  component: () => (
-    <>
-      <nav style={{ marginBottom: 16 }}>
-        <Link to="/auth" style={{ marginRight: 8 }}>
-          Login
-        </Link>
-        <Link to="/dashboard">Dashboard</Link>
-      </nav>
-      <Outlet />
-    </>
-  ),
+  component: () => {
+    const router = useRouter();
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      router.history.replace('/auth');
+    }
+    return (
+      <div className="m-2 sm:m-4 md:m-8">
+        <Outlet />
+      </div>
+    );
+  },
 });
