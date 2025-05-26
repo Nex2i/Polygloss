@@ -1,5 +1,4 @@
 import { join } from 'path';
-import { createServer } from 'http';
 import Fastify from 'fastify';
 import AutoLoad from '@fastify/autoload';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
