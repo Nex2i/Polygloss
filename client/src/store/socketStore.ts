@@ -44,6 +44,7 @@ export function useSocketChat(): UseSocketChatResult {
 
     // Generate userId on connect
     // userIdRef.current = (Math.floor(Math.random() * 1_000_000) + 1).toString();
+    console.log('sessionId', sessionId);
     userIdRef.current = 'test-user';
 
     socket = io(API_BASE_URL, {

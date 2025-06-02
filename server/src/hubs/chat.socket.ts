@@ -225,7 +225,7 @@ export function ChatSocket(socket: Socket) {
   });
 
   // Get chat statistics
-  socket.on(SOCKET_EVENTS.GET_CHAT_STATS, (payload: ChatStatsPayload) => {
+  socket.on(SOCKET_EVENTS.GET_CHAT_STATS, (_payload: ChatStatsPayload) => {
     try {
       const stats = chatHistoryService.getStats();
       socket.emit(SOCKET_EVENTS.GET_CHAT_STATS_SUCCESS, stats as ChatStatsSuccessResponse);
