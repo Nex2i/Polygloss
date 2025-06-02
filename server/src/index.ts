@@ -1,33 +1,26 @@
-import { Server as SocketIOServer } from 'socket.io';
+import { Server as SocketIOServer, Socket } from 'socket.io';
 import dotenv from 'dotenv';
 import App from './app';
 import { getNetworkAddress } from './utils/network';
 import { logger } from './libs/logger';
+import { ChatSocket } from './hubs/chat.socket';
 
 dotenv.config();
 const PORT: number = Number(process.env.PORT || 3001);
 
 (async () => {
   const app = await App();
-  const io = new SocketIOServer(app.server, {
+  const chatSocket = new SocketIOServer(app.server, {
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
     },
-    path: '/api/chat',
+    path: '/api/chat/training',
   });
 
-  io.on('connection', (socket) => {
+  chatSocket.on('connection', (socket) => {
     logger.info('Socket.io client connected');
-    socket.on('chat message', (msg) => {
-      // Echo the message back to the sender (or broadcast as needed)
-      const message = {
-        content: msg.content,
-        timestamp: new Date().toISOString(),
-        senderId: 'SYSTEM_USER',
-      };
-      socket.emit('chat message', message);
-    });
+    ChatSocket(socket);
     socket.on('disconnect', () => {
       logger.info('Socket.io client disconnected');
     });
