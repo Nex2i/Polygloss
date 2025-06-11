@@ -1,5 +1,5 @@
 import React from 'react';
-import AnimatedSphere from './AnimatedSphere';
+import AnimatedAvatar from './AnimatedAvatar';
 import AudioInputIndicator from './AudioInputIndicator';
 
 interface ConversationScreenProps {
@@ -40,9 +40,9 @@ const ConversationScreen: React.FC<ConversationScreenProps> = ({
           </div>
         </div>
 
-        {/* Center Column - Animated Sphere */}
+        {/* Center Column - Animated Avatar */}
         <div className="flex flex-col items-center">
-          <AnimatedSphere
+          <AnimatedAvatar
             audioLevel={audioLevel}
             isSpeaking={isSpeaking}
             isConnected={isConnected}
