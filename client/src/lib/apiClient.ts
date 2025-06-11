@@ -31,7 +31,7 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085' + '/api';
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL + '/api';
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
@@ -53,6 +53,8 @@ class ApiClient {
 
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const headers = await this.getAuthHeaders();
+
+    console.log('baseUrl', this.baseUrl);
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
