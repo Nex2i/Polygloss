@@ -4,10 +4,7 @@ interface RequestOptions extends RequestInit {
   // You can add custom options here if needed in the future
 }
 
-async function apiClient<T = unknown>(
-  url: string,
-  options: RequestOptions = {}
-): Promise<T | null> {
+async function apiClient<T = unknown>(url: string, options: RequestOptions = {}): Promise<T> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -43,9 +40,14 @@ async function apiClient<T = unknown>(
   if (contentType && contentType.includes('application/json')) {
     return response.json() as Promise<T>;
   }
-  // For non-JSON responses, or empty responses, return null
-  // Callers should check for null and handle accordingly
-  return null;
+
+  // For 204 No Content, return empty object as T
+  if (response.status === 204) {
+    return {} as T;
+  }
+
+  // For other non-JSON responses, throw an error since we can't provide T
+  throw new Error(`Expected JSON response but received ${contentType || 'unknown content type'}`);
 }
 
 export default apiClient;
