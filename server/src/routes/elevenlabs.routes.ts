@@ -3,7 +3,7 @@ import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { HttpMethods } from '@/utils/HttpMethods';
 
 const apiKey = process.env.ELEVENLABS_API_KEY;
-const agentId = process.env.ELEVENLABS_AGENT_ID;
+const spanishAgentId = process.env.ELEVENLABS_AGENT_ID_SPANISH;
 
 const elevenlabs = new ElevenLabsClient({ apiKey: apiKey });
 
@@ -30,7 +30,7 @@ export default async function ElevenLabs(fastify: FastifyInstance, _opts: RouteO
           });
         }
 
-        if (!agentId) {
+        if (!spanishAgentId) {
           return reply.status(500).send({
             error: 'Eleven Labs Agent ID not configured',
             message: 'ELEVENLABS_AGENT_ID environment variable is required',
@@ -41,16 +41,16 @@ export default async function ElevenLabs(fastify: FastifyInstance, _opts: RouteO
         const { lessonLevel } = req.body || {};
 
         console.log('APIKEY', apiKey);
-        console.log('AGENTID', agentId);
+        console.log('AGENTID', spanishAgentId);
 
         // Call Eleven Labs API to get signed URL
         const response = await elevenlabs.conversationalAi.conversations.getSignedUrl({
-          agentId,
+          agentId: spanishAgentId,
         });
 
         return reply.status(200).send({
           signedUrl: response.signedUrl,
-          agentId,
+          agentId: spanishAgentId,
           lessonLevel,
           expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // URLs typically expire in 5 minutes
         });
