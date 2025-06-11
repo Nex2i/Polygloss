@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useConversation, type SessionConfig } from '@elevenlabs/react';
 import { VoiceChatHeader, SetupScreen, ConnectingScreen, ConversationScreen } from './voice-chat';
 import { useElevenLabsSignedUrl } from '../hooks/useElevenLabsSignedUrl';
+import { useUser } from '../hooks/useUser';
 
 interface VoiceChatProps {}
 
@@ -17,6 +18,9 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
   // Hook for getting signed URL from authenticated endpoint
   const signedUrlMutation = useElevenLabsSignedUrl();
+
+  // Hook for getting user data
+  const { user, displayName } = useUser();
 
   // Initialize Eleven Labs conversation
   const conversation = useConversation({
@@ -235,14 +239,26 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
         lessonLevel: selectedLevel,
       });
 
+      const userName = user?.name || displayName || 'Student';
+
       const sessionConfig: SessionConfig = {
         signedUrl: signedUrlData.signedUrl,
         dynamicVariables: {
           skill_level: signedUrlData.lessonLevel ?? 3,
+          user_name: userName,
         },
       };
 
       console.log('🚀 [CONNECTION] Session config', sessionConfig);
+      console.log(
+        '👤 [CONNECTION] Using user name:',
+        userName,
+        '(from user.name:',
+        user?.name,
+        ', displayName:',
+        displayName,
+        ')'
+      );
 
       await conversation.startSession(sessionConfig);
     } catch (error) {
