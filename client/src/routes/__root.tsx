@@ -6,6 +6,7 @@ import type { Session } from '@supabase/supabase-js';
 import { useAppDispatch, useAppSelector } from '../store';
 import { fetchCurrentUser, clearUser, setShouldLogout } from '../store/userSlice';
 import { UserProfile } from '../components/UserProfile';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export const Route = createRootRoute({
   component: () => <RootComponent />,
@@ -94,8 +95,7 @@ function RootComponent() {
   };
 
   if (loading || userLoading) {
-    // You can replace this with a proper loading spinner component
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   // Determine if the navigation menu (and logout button) should be shown
