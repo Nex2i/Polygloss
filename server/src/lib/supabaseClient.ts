@@ -8,7 +8,9 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY; // Or SUPABASE_SERVICE_KEY if you choose to use it
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL or anon key is missing. Make sure to set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file.');
+  throw new Error(
+    'Supabase URL or anon key is missing. Make sure to set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file.'
+  );
 }
 
 // Note: For server-side operations, especially those requiring admin privileges

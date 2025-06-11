@@ -29,7 +29,7 @@ function RootComponent() {
       // If user logs out, newSession will be null.
       // If user logs in, newSession will be populated.
       if (_event === 'SIGNED_OUT' && newSession === null) {
-        navigate({ to: '/auth', replace: true });
+        navigate({ to: '/auth', search: { redirect: '/dashboard' }, replace: true });
       } else if (_event === 'SIGNED_IN' && newSession !== null) {
         // Optionally navigate to dashboard on sign in if not already there
         // However, individual components (like AuthPage) might handle this better
@@ -46,13 +46,17 @@ function RootComponent() {
       const currentPath = router.state.location.pathname;
       if (!session && currentPath !== '/auth') {
         // If no session and not on auth page, redirect to auth
-        navigate({ to: '/auth', replace: true });
+        navigate({ to: '/auth', search: { redirect: currentPath }, replace: true });
       } else if (session && currentPath === '/auth') {
         // If there is a session and on auth page, redirect to dashboard
         navigate({ to: '/dashboard', replace: true });
       } else if (currentPath === '/') {
         // If at root, redirect based on session
-        navigate({ to: session ? '/dashboard' : '/auth', replace: true });
+        navigate({
+          to: session ? '/dashboard' : '/auth',
+          search: session ? undefined : { redirect: '/dashboard' },
+          replace: true,
+        });
       }
     }
   }, [session, loading, router.state.location.pathname, navigate]);

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute, useRouter, useSearch } from '@tanstack/react-router';
 import { supabase } from '../lib/supabaseClient'; // Adjusted path
 
 export const Route = createFileRoute('/auth')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: (search.redirect as string) || '/dashboard',
+  }),
   component: AuthPage,
 });
 
@@ -12,6 +15,7 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { redirect } = useSearch({ from: '/auth' });
 
   const handleSignUp = async () => {
     setLoading(true);
@@ -46,11 +50,13 @@ function AuthPage() {
         if (signInError) {
           setError(signInError.message);
         } else {
-          router.navigate({ to: '/dashboard' });
+          router.navigate({ to: redirect });
         }
       } else {
         // This case might occur if email confirmation is pending
-        setError("Sign up successful. Please check your email to confirm your account if required, then try signing in.");
+        setError(
+          'Sign up successful. Please check your email to confirm your account if required, then try signing in.'
+        );
       }
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred during sign up.');
@@ -70,7 +76,7 @@ function AuthPage() {
       if (signInError) {
         setError(signInError.message);
       } else {
-        router.navigate({ to: '/dashboard' });
+        router.navigate({ to: redirect });
       }
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred during sign in.');
@@ -81,12 +87,13 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-[#f7f9fb] flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-md flex flex-col items-center">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-[#11131a] text-center">
-          Welcome!
-        </h1>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-[#11131a] text-center">Welcome!</h1>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 w-full" role="alert">
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 w-full"
+            role="alert"
+          >
             <span className="block sm:inline">{error}</span>
           </div>
         )}

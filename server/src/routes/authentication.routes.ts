@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply, RouteOptions } from 'fastify';
 import { HttpMethods } from '@/utils/HttpMethods';
 import { supabase } from '@/lib/supabaseClient'; // Import server-side Supabase client
-import { FromSchema } from 'json-schema-to-ts';
 
 const basePath = '/auth';
 
@@ -39,7 +38,9 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
       // } catch (error: any) {
       //   reply.status(500).send({ message: 'Internal server error during login', error: error.message });
       // }
-      reply.send({ message: 'Client handles login directly with Supabase. This endpoint is informational.' });
+      reply.send({
+        message: 'Client handles login directly with Supabase. This endpoint is informational.',
+      });
     },
   });
 
@@ -64,7 +65,7 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
       }
 
       try {
-        const { error } = await supabase.auth.signOut(token); // Pass the user's JWT to invalidate it server-side
+        const { error } = await supabase.auth.signOut();
         if (error) {
           fastify.log.error(`Supabase signOut error: ${error.message}`);
           reply.status(500).send({ message: 'Logout failed', error: error.message });
@@ -73,7 +74,9 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
         reply.send({ message: 'Logout successful' });
       } catch (error: any) {
         fastify.log.error(`Server error during logout: ${error.message}`);
-        reply.status(500).send({ message: 'Internal server error during logout', error: error.message });
+        reply
+          .status(500)
+          .send({ message: 'Internal server error during logout', error: error.message });
       }
     },
   });
@@ -109,23 +112,31 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
     schema: {
       tags: ['Authentication'],
       summary: 'Delete User (Not Implemented)',
-      description: 'Delete a user by userId. (This endpoint is not fully implemented and requires admin privileges.)',
+      description:
+        'Delete a user by userId. (This endpoint is not fully implemented and requires admin privileges.)',
       params: {
         type: 'object',
         properties: {
           userId: { type: 'string', description: 'ID of the user to delete' },
         },
         required: ['userId'],
-      }
+      },
     },
-    handler: async (request: FastifyRequest<{ Params: { userId: string } }>, reply: FastifyReply) => {
+    handler: async (
+      request: FastifyRequest<{ Params: { userId: string } }>,
+      reply: FastifyReply
+    ) => {
       const { userId } = request.params;
       // IMPORTANT: Deleting a user is a privileged operation.
       // You would need to use the Supabase Admin SDK or a service_role key here,
       // and ensure the calling user has administrative rights.
       // Example: await supabase.auth.admin.deleteUser(userId);
-      fastify.log.warn(`Attempt to delete user ${userId} - This functionality requires admin privileges and is not fully implemented.`);
-      reply.status(501).send({ message: 'Not Implemented: User deletion requires admin privileges.' });
+      fastify.log.warn(
+        `Attempt to delete user ${userId} - This functionality requires admin privileges and is not fully implemented.`
+      );
+      reply
+        .status(501)
+        .send({ message: 'Not Implemented: User deletion requires admin privileges.' });
     },
   });
 }
