@@ -12,9 +12,12 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TrainingchatImport } from './routes/trainingchat'
+import { Route as SignupImport } from './routes/signup'
+import { Route as LoginImport } from './routes/login'
 import { Route as AuthImport } from './routes/auth'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppVoiceChatImport } from './routes/_app/voice-chat'
+import { Route as AppProfileImport } from './routes/_app/profile'
 import { Route as AppDashboardImport } from './routes/_app/dashboard'
 
 // Create/Update Routes
@@ -22,6 +25,18 @@ import { Route as AppDashboardImport } from './routes/_app/dashboard'
 const TrainingchatRoute = TrainingchatImport.update({
   id: '/trainingchat',
   path: '/trainingchat',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SignupRoute = SignupImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,6 +54,12 @@ const AppRoute = AppImport.update({
 const AppVoiceChatRoute = AppVoiceChatImport.update({
   id: '/voice-chat',
   path: '/voice-chat',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppProfileRoute = AppProfileImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -66,6 +87,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupImport
+      parentRoute: typeof rootRoute
+    }
     '/trainingchat': {
       id: '/trainingchat'
       path: '/trainingchat'
@@ -78,6 +113,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileImport
       parentRoute: typeof AppImport
     }
     '/_app/voice-chat': {
@@ -94,11 +136,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppVoiceChatRoute: typeof AppVoiceChatRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppProfileRoute: AppProfileRoute,
   AppVoiceChatRoute: AppVoiceChatRoute,
 }
 
@@ -107,16 +151,22 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/trainingchat': typeof TrainingchatRoute
   '/dashboard': typeof AppDashboardRoute
+  '/profile': typeof AppProfileRoute
   '/voice-chat': typeof AppVoiceChatRoute
 }
 
 export interface FileRoutesByTo {
   '': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/trainingchat': typeof TrainingchatRoute
   '/dashboard': typeof AppDashboardRoute
+  '/profile': typeof AppProfileRoute
   '/voice-chat': typeof AppVoiceChatRoute
 }
 
@@ -124,22 +174,44 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/trainingchat': typeof TrainingchatRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/voice-chat': typeof AppVoiceChatRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/auth' | '/trainingchat' | '/dashboard' | '/voice-chat'
+  fullPaths:
+    | ''
+    | '/auth'
+    | '/login'
+    | '/signup'
+    | '/trainingchat'
+    | '/dashboard'
+    | '/profile'
+    | '/voice-chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/auth' | '/trainingchat' | '/dashboard' | '/voice-chat'
+  to:
+    | ''
+    | '/auth'
+    | '/login'
+    | '/signup'
+    | '/trainingchat'
+    | '/dashboard'
+    | '/profile'
+    | '/voice-chat'
   id:
     | '__root__'
     | '/_app'
     | '/auth'
+    | '/login'
+    | '/signup'
     | '/trainingchat'
     | '/_app/dashboard'
+    | '/_app/profile'
     | '/_app/voice-chat'
   fileRoutesById: FileRoutesById
 }
@@ -147,12 +219,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
   TrainingchatRoute: typeof TrainingchatRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
   TrainingchatRoute: TrainingchatRoute,
 }
 
@@ -168,6 +244,8 @@ export const routeTree = rootRoute
       "children": [
         "/_app",
         "/auth",
+        "/login",
+        "/signup",
         "/trainingchat"
       ]
     },
@@ -175,17 +253,28 @@ export const routeTree = rootRoute
       "filePath": "_app.tsx",
       "children": [
         "/_app/dashboard",
+        "/_app/profile",
         "/_app/voice-chat"
       ]
     },
     "/auth": {
       "filePath": "auth.tsx"
     },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/signup": {
+      "filePath": "signup.tsx"
+    },
     "/trainingchat": {
       "filePath": "trainingchat.tsx"
     },
     "/_app/dashboard": {
       "filePath": "_app/dashboard.tsx",
+      "parent": "/_app"
+    },
+    "/_app/profile": {
+      "filePath": "_app/profile.tsx",
       "parent": "/_app"
     },
     "/_app/voice-chat": {

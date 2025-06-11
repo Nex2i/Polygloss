@@ -4,7 +4,8 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { supabase } from '../lib/supabaseClient';
 import type { Session } from '@supabase/supabase-js';
 import { useAppDispatch, useAppSelector } from '../store';
-import { fetchCurrentUser, clearUser } from '../store/userSlice';
+import { fetchCurrentUser, clearUser, setShouldLogout } from '../store/userSlice';
+import { UserProfile } from '../components/UserProfile';
 
 export const Route = createRootRoute({
   component: () => <RootComponent />,
@@ -14,7 +15,7 @@ function RootComponent() {
   const router = useRouter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { user: dbUser, loading: userLoading } = useAppSelector((state) => state.user);
+  const { loading: userLoading, shouldLogout } = useAppSelector((state) => state.user);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,6 +52,16 @@ function RootComponent() {
       authListener?.subscription.unsubscribe();
     };
   }, [navigate, dispatch]);
+
+  // Watch for shouldLogout flag and automatically log out user
+  useEffect(() => {
+    if (shouldLogout) {
+      console.log('Auto-logout triggered due to authentication failure');
+      setSession(null);
+      dispatch(setShouldLogout(false)); // Reset the flag
+      navigate({ to: '/auth', search: { redirect: '/dashboard' }, replace: true });
+    }
+  }, [shouldLogout, dispatch, navigate]);
 
   useEffect(() => {
     if (!loading) {
@@ -96,13 +107,16 @@ function RootComponent() {
       {showNav && (
         <nav className="bg-gray-800 text-white p-4 mb-4">
           <div className="container mx-auto flex justify-between items-center">
-            <Link to="/dashboard" className="text-xl font-bold hover:text-gray-300">
-              Dashboard
-            </Link>
-            <div>
-              <span className="mr-4">
-                Welcome, {dbUser?.name || dbUser?.email || session?.user?.email}
-              </span>
+            <div className="flex items-center space-x-6">
+              <Link to="/dashboard" className="text-xl font-bold hover:text-gray-300">
+                Dashboard
+              </Link>
+              <Link to="/profile" className="text-lg hover:text-gray-300">
+                Profile
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <UserProfile />
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"

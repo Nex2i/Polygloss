@@ -66,7 +66,26 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+
+      // Create detailed error message with status code
+      const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+
+      // Log the error for debugging
+      console.error(`API Error [${response.status}]:`, {
+        endpoint,
+        status: response.status,
+        statusText: response.statusText,
+        errorData,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
+      // Create error with additional context
+      const error = new Error(errorMessage);
+      (error as any).status = response.status;
+      (error as any).statusText = response.statusText;
+      (error as any).response = errorData;
+
+      throw error;
     }
 
     return response.json();

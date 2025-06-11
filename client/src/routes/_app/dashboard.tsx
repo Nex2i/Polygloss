@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { AuthDebugger } from '../../components/AuthDebugger';
 
 export const Route = createFileRoute('/_app/dashboard')({
   component: Dashboard,
@@ -9,6 +10,9 @@ function Dashboard() {
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4">
+        {/* Auth Debugger - Remove this in production */}
+        <AuthDebugger />
+
         <h2 className="text-2xl font-bold mb-6">Start a new chat</h2>
 
         {/* Voice Chat AI Option */}
