@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useConversation, type SessionConfig } from '@elevenlabs/react';
 import { VoiceChatHeader, SetupScreen, ConnectingScreen, ConversationScreen } from './voice-chat';
 import { useElevenLabsSignedUrl } from '../hooks/useElevenLabsSignedUrl';
@@ -55,6 +55,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
         }))
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
 
       const source = audioContextRef.current.createMediaStreamSource(stream);
@@ -110,7 +111,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   };
 
   // Clean up audio context
-  const cleanupAudio = () => {
+  const cleanupAudio = useCallback(() => {
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
@@ -121,7 +122,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     }
 
     setAudioLevel(0);
-  };
+  }, [setAudioLevel]);
 
   // Connect to Eleven Labs
   const connectToElevenLabs = async () => {
@@ -186,7 +187,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   };
 
   // Disconnect from Eleven Labs
-  const disconnect = async () => {
+  const disconnect = useCallback(async () => {
     try {
       await conversation.endSession();
     } catch (error) {
@@ -199,14 +200,14 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
     cleanupAudio();
     setConversationStarted(false);
-  };
+  }, [conversation, cleanupAudio, setConversationStarted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       disconnect();
     };
-  }, []);
+  }, [disconnect]);
 
   return (
     <div id="voice-chat" className="flex flex-col h-screen bg-gray-100">

@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
-import { HttpMethods } from '@/utils/HttpMethods';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import { HttpMethods } from '@/utils/HttpMethods';
 
 const apiKey = process.env.ELEVENLABS_API_KEY;
 const agentId = process.env.ELEVENLABS_AGENT_ID;
