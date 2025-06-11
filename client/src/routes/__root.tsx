@@ -37,7 +37,7 @@ function RootComponent() {
     });
 
     return () => {
-      authListener?.unsubscribe();
+      authListener?.subscription.unsubscribe();
     };
   }, [navigate]);
 
@@ -96,9 +96,7 @@ function RootComponent() {
           </div>
         </nav>
       )}
-      <div className={`m-2 sm:m-4 md:m-8 ${showNav ? 'pt-16' : ''}`}>
-        {' '}
-        {/* Adjust padding if nav is fixed */}
+      <div className="w-screen max-w-[100vw] h-screen max-h-[100vh] overflow-hidden">
         <Outlet />
       </div>
     </>
