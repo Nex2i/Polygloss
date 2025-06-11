@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-declare const globalThis: {
-  prismaGlobal: PrismaClient;
-} & typeof global;
+declare global {
+  var prismaGlobal: PrismaClient | undefined;
+}
 
 const prisma =
   globalThis.prismaGlobal ??

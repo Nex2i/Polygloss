@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply, RouteOptions } from 'fastify';
+import { Type } from '@sinclair/typebox';
 import { HttpMethods } from '@/utils/HttpMethods';
 import { supabase } from '@/lib/supabaseClient'; // Import regular client
 import { UserService, CreateUserData } from '@/modules/user.service';
-import { Type } from '@sinclair/typebox';
 
 const basePath = '/auth';
 

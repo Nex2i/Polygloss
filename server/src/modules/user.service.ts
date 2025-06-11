@@ -1,5 +1,5 @@
-import prisma from '@/lib/prismaClient';
 import { User } from '@prisma/client';
+import prisma from '@/lib/prismaClient';
 
 export interface CreateUserData {
   supabaseId: string;
