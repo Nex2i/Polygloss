@@ -20,7 +20,7 @@ export default async function ElevenLabs(fastify: FastifyInstance, _opts: RouteO
   fastify.route<GetSignedUrlRequest>({
     method: HttpMethods.POST,
     url: `${basePath}/signed-url`,
-    // preHandler: [fastify.authPrehandler],
+    preHandler: [fastify.authPrehandler],
     handler: async (req: FastifyRequest<GetSignedUrlRequest>, reply: FastifyReply) => {
       try {
         if (!apiKey) {
