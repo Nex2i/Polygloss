@@ -31,7 +31,7 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api';
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085' + '/api';
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
