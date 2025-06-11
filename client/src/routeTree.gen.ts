@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as VoiceChatImport } from './routes/voice-chat'
 import { Route as TrainingchatImport } from './routes/trainingchat'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AuthImport } from './routes/auth'
 
 // Create/Update Routes
+
+const VoiceChatRoute = VoiceChatImport.update({
+  id: '/voice-chat',
+  path: '/voice-chat',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const TrainingchatRoute = TrainingchatImport.update({
   id: '/trainingchat',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrainingchatImport
       parentRoute: typeof rootRoute
     }
+    '/voice-chat': {
+      id: '/voice-chat'
+      path: '/voice-chat'
+      fullPath: '/voice-chat'
+      preLoaderRoute: typeof VoiceChatImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -69,12 +83,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/trainingchat': typeof TrainingchatRoute
+  '/voice-chat': typeof VoiceChatRoute
 }
 
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/trainingchat': typeof TrainingchatRoute
+  '/voice-chat': typeof VoiceChatRoute
 }
 
 export interface FileRoutesById {
@@ -82,14 +98,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/trainingchat': typeof TrainingchatRoute
+  '/voice-chat': typeof VoiceChatRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/dashboard' | '/trainingchat'
+  fullPaths: '/auth' | '/dashboard' | '/trainingchat' | '/voice-chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/dashboard' | '/trainingchat'
-  id: '__root__' | '/auth' | '/dashboard' | '/trainingchat'
+  to: '/auth' | '/dashboard' | '/trainingchat' | '/voice-chat'
+  id: '__root__' | '/auth' | '/dashboard' | '/trainingchat' | '/voice-chat'
   fileRoutesById: FileRoutesById
 }
 
@@ -97,12 +114,14 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   TrainingchatRoute: typeof TrainingchatRoute
+  VoiceChatRoute: typeof VoiceChatRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   TrainingchatRoute: TrainingchatRoute,
+  VoiceChatRoute: VoiceChatRoute,
 }
 
 export const routeTree = rootRoute
@@ -117,7 +136,8 @@ export const routeTree = rootRoute
       "children": [
         "/auth",
         "/dashboard",
-        "/trainingchat"
+        "/trainingchat",
+        "/voice-chat"
       ]
     },
     "/auth": {
@@ -128,6 +148,9 @@ export const routeTree = rootRoute
     },
     "/trainingchat": {
       "filePath": "trainingchat.tsx"
+    },
+    "/voice-chat": {
+      "filePath": "voice-chat.tsx"
     }
   }
 }
