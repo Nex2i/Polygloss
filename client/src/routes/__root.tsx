@@ -7,7 +7,7 @@ export const Route = createRootRoute({
       router.history.replace('/auth');
     }
     return (
-      <div className="m-2 sm:m-4 md:m-8">
+      <div className="w-screen max-w-[100vw] h-screen max-h-[100vh] overflow-hidden">
         <Outlet />
       </div>
     );
