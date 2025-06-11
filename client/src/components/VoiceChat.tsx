@@ -187,7 +187,8 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   };
 
   // Disconnect from Eleven Labs
-  const disconnect = async () => {
+  const disconnect = useCallback(async () => {
+    console.log('🔌 [DISCONNECT] Disconnecting from Eleven Labs');
     try {
       await conversation.endSession();
     } catch (error) {
@@ -200,7 +201,8 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
     cleanupAudio();
     setConversationStarted(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
