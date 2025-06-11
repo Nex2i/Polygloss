@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import apiClient from '../lib/apiClient';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,24 +15,16 @@ interface SignedUrlResponse {
 }
 
 async function fetchSignedUrl(request: SignedUrlRequest): Promise<SignedUrlResponse> {
-  // For now, we'll use a placeholder token. In a real app, this would come from auth state
-  const token = 'placeholder-jwt-token';
-
-  const response = await fetch(`${API_BASE_URL}/api/elevenlabs/signed-url`, {
+  const result = await apiClient<SignedUrlResponse>(`${API_BASE_URL}/api/elevenlabs/signed-url`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
     body: JSON.stringify(request),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Failed to get signed URL: ${response.statusText}`);
+  if (!result) {
+    throw new Error('Failed to get signed URL: API returned null response');
   }
 
-  return response.json();
+  return result;
 }
 
 export function useElevenLabsSignedUrl() {
