@@ -65,9 +65,11 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
       }
 
       try {
-        const { error } = await supabase.auth.signOut();
+        // For server-side logout, we need to use the admin API to sign out the user's session
+        // The token represents the user's JWT that we need to invalidate
+        const { error } = await supabase.auth.admin.signOut(token);
         if (error) {
-          fastify.log.error(`Supabase signOut error: ${error.message}`);
+          fastify.log.error(`Supabase admin signOut error: ${error.message}`);
           reply.status(500).send({ message: 'Logout failed', error: error.message });
           return;
         }

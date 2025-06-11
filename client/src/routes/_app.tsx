@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { supabase } from '../lib/supabaseClient';
 
 export const Route = createFileRoute('/_app')({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_app')({
       throw redirect({
         to: '/auth',
         search: {
-          redirect: window.location.pathname || '/dashboard',
+          redirect: location.pathname || '/dashboard',
         },
       });
     }

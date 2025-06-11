@@ -4,11 +4,10 @@ interface RequestOptions extends RequestInit {
   // You can add custom options here if needed in the future
 }
 
-async function apiClient<T = any>(
-  url: string,
-  options: RequestOptions = {}
-): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession();
+async function apiClient<T = any>(url: string, options: RequestOptions = {}): Promise<T | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const token = session?.access_token;
 
   const headers = new Headers(options.headers || {});
@@ -19,7 +18,6 @@ async function apiClient<T = any>(
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.append('Content-Type', 'application/json');
   }
-
 
   const response = await fetch(url, {
     ...options,
@@ -42,9 +40,9 @@ async function apiClient<T = any>(
   if (contentType && contentType.includes('application/json')) {
     return response.json() as Promise<T>;
   }
-  // For non-JSON responses, or empty responses, you might return null or response.text()
-  // For simplicity, returning null if not JSON. Adjust as needed.
-  return null as any; // Cast to any to satisfy Promise<T> if response isn't JSON
+  // For non-JSON responses, or empty responses, return null
+  // Callers should check for null and handle accordingly
+  return null;
 }
 
 export default apiClient;
