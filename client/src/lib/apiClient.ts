@@ -4,7 +4,10 @@ interface RequestOptions extends RequestInit {
   // You can add custom options here if needed in the future
 }
 
-async function apiClient<T = any>(url: string, options: RequestOptions = {}): Promise<T | null> {
+async function apiClient<T = unknown>(
+  url: string,
+  options: RequestOptions = {}
+): Promise<T | null> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -29,7 +32,7 @@ async function apiClient<T = any>(url: string, options: RequestOptions = {}): Pr
     let errorData;
     try {
       errorData = await response.json();
-    } catch (e) {
+    } catch {
       // Ignore if response is not JSON
     }
     throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);

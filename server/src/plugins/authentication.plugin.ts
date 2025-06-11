@@ -5,11 +5,13 @@ import { logger } from '@/libs/logger'; // Assuming this is your logger
 import { supabase } from '@/lib/supabaseClient'; // Import the server-side Supabase client
 
 export default fastifyPlugin(async (fastify: FastifyInstance) => {
-  const authPrehandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  const authPrehandler = async (request: FastifyRequest, _reply: FastifyReply) => {
     try {
       const authHeader = request.headers?.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new ForbiddenError('No or invalid Authorization Header format. Expected Bearer token.');
+        throw new ForbiddenError(
+          'No or invalid Authorization Header format. Expected Bearer token.'
+        );
       }
 
       const token = authHeader.substring('Bearer '.length);
@@ -18,7 +20,10 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
         throw new ForbiddenError('No token provided in Authorization Header.');
       }
 
-      const { data: { user }, error } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser(token);
 
       if (error) {
         logger.warn(`Supabase auth.getUser error: ${error.message}`, {
@@ -38,7 +43,6 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
       // Ensure your FastifyRequest interface is extended to include 'user'
       // (as seen in the original file, it was expected to be `request.user = payload.user;`)
       (request as any).user = user; // Using 'as any' for now, proper type extension is better
-
     } catch (error: any) {
       // Log the error with more details
       logger.warn(`authPrehandler Error: ${error.message || 'Unknown auth error'}`, {
@@ -51,9 +55,8 @@ export default fastifyPlugin(async (fastify: FastifyInstance) => {
       // Ensure reply is sent for errors thrown by the prehandler
       // The 'ForbiddenError' should ideally be handled by a global error handler
       // that sets the correct status code. If not, set it here.
-      const statusCode = error.statusCode || 403; // Default to 403 for ForbiddenError
       const errorMessage = error.message || 'Authentication failed.';
-      
+
       // If a global error handler is configured to catch these and send replies,
       // re-throwing might be enough. Otherwise, explicitly send reply.
       // For now, let's assume a global handler will catch and reply.

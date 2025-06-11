@@ -58,8 +58,8 @@ function AuthPage() {
           'Sign up successful. Please check your email to confirm your account if required, then try signing in.'
         );
       }
-    } catch (e: any) {
-      setError(e.message || 'An unexpected error occurred during sign up.');
+    } catch (e: unknown) {
+      setError((e as Error).message || 'An unexpected error occurred during sign up.');
     }
     setLoading(false);
   };
@@ -78,8 +78,8 @@ function AuthPage() {
       } else {
         router.navigate({ to: redirect });
       }
-    } catch (e: any) {
-      setError(e.message || 'An unexpected error occurred during sign in.');
+    } catch (e: unknown) {
+      setError((e as Error).message || 'An unexpected error occurred during sign in.');
     }
     setLoading(false);
   };
