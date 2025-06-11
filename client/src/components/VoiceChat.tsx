@@ -49,7 +49,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
       source.connect(analyserRef.current);
-      
+
       // Start monitoring audio levels
       monitorAudioLevel();
     } catch (error) {
@@ -60,9 +60,9 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   // Monitor audio input levels for visual feedback
   const monitorAudioLevel = () => {
     if (!analyserRef.current) return;
-    
+
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    
+
     const updateAudioLevel = () => {
       if (analyserRef.current && conversation.status === 'connected') {
         analyserRef.current.getByteFrequencyData(dataArray);
@@ -71,7 +71,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
       }
       animationRef.current = requestAnimationFrame(updateAudioLevel);
     };
-    
+
     updateAudioLevel();
   };
 
@@ -81,11 +81,11 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
-    
+
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
     setAudioLevel(0);
   };
 
@@ -97,40 +97,33 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     }
 
     setIsConnecting(true);
-    
+
     try {
       // Request microphone permission first
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       // Initialize audio monitoring
       await initializeAudio();
-      
+
       // For demonstration purposes, using a placeholder agent ID
       // In production, you would either:
       // 1. Use a public agent ID directly
       // 2. Get a signed URL from your backend for private agents
       const agentId = 'your-agent-id-here'; // Replace with your actual agent ID
-      
+
       await conversation.startSession({
         agentId: agentId,
-        // You can add custom variables based on lesson level
-        overrides: {
-          agent: {
-            prompt: {
-              prompt: `You are a Spanish language tutor conducting a conversation at level ${selectedLevel} (1-10 scale, where 1 is beginner and 10 is advanced). Adjust your vocabulary, grammar complexity, and speaking pace accordingly. Focus on helping the student practice speaking Spanish through natural conversation.`
-            }
-          }
-        }
       });
-      
     } catch (error) {
       console.error('Failed to connect to Eleven Labs:', error);
       setIsConnecting(false);
       setConversationStarted(false);
       cleanupAudio();
-      
+
       // Show user-friendly error message
-      alert('Failed to connect to the voice AI. Please check your microphone permissions and try again.');
+      alert(
+        'Failed to connect to the voice AI. Please check your microphone permissions and try again.'
+      );
     }
   };
 
@@ -157,7 +150,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     const sphereScale = 1 + (audioLevel / 255) * 0.3; // Scale based on audio level
     const pulseIntensity = conversation.isSpeaking ? 'animate-pulse' : '';
     const glowIntensity = conversation.status === 'connected' ? 20 + audioLevel / 10 : 5;
-    
+
     return (
       <div className="flex items-center justify-center mb-8">
         <div
@@ -165,9 +158,9 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
           style={{
             transform: `scale(${sphereScale})`,
             boxShadow: `0 0 ${glowIntensity}px rgba(59, 130, 246, 0.5)`,
-            background: conversation.isSpeaking 
-              ? 'linear-gradient(45deg, #10b981, #06b6d4, #8b5cf6)' 
-              : 'linear-gradient(45deg, #60a5fa, #a855f7)'
+            background: conversation.isSpeaking
+              ? 'linear-gradient(45deg, #10b981, #06b6d4, #8b5cf6)'
+              : 'linear-gradient(45deg, #60a5fa, #a855f7)',
           }}
         >
           <div className="w-full h-full rounded-full bg-gradient-to-tr from-white/20 to-transparent"></div>
@@ -180,11 +173,15 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   const AudioInputIndicator = () => {
     const bars = Array.from({ length: 5 }, (_, i) => i);
     const isListening = conversation.status === 'connected' && !conversation.isSpeaking;
-    
+
     return (
       <div className="flex items-center space-x-1 mb-4">
         <span className="text-sm text-gray-600 mr-2">
-          {conversation.isSpeaking ? 'AI Speaking...' : isListening ? 'Listening...' : 'Not listening'}
+          {conversation.isSpeaking
+            ? 'AI Speaking...'
+            : isListening
+              ? 'Listening...'
+              : 'Not listening'}
         </span>
         <div className="flex items-end space-x-1">
           {bars.map((bar) => (
@@ -195,7 +192,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
               }`}
               style={{
                 height: `${8 + (audioLevel / 255) * 20 + bar * 2}px`,
-                backgroundColor: conversation.isSpeaking ? '#ef4444' : '#10b981'
+                backgroundColor: conversation.isSpeaking ? '#ef4444' : '#10b981',
               }}
             ></div>
           ))}
@@ -236,7 +233,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
             <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
               Start Voice Conversation
             </h2>
-            
+
             {/* Lesson Level Dropdown */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -249,7 +246,8 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
               >
                 {lessonLevels.map((level) => (
                   <option key={level} value={level}>
-                    Level {level} {level <= 3 ? '(Beginner)' : level <= 6 ? '(Intermediate)' : '(Advanced)'}
+                    Level {level}{' '}
+                    {level <= 3 ? '(Beginner)' : level <= 6 ? '(Intermediate)' : '(Advanced)'}
                   </option>
                 ))}
               </select>
@@ -263,12 +261,13 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
             >
               Connect to Eleven Labs
             </button>
-            
+
             {/* Instructions */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> This demo requires an Eleven Labs agent ID. 
-                Please replace 'your-agent-id-here' in the code with your actual agent ID from the Eleven Labs dashboard.
+                <strong>Note:</strong> This demo requires an Eleven Labs agent ID. Please replace
+                'your-agent-id-here' in the code with your actual agent ID from the Eleven Labs
+                dashboard.
               </p>
             </div>
           </div>
@@ -289,25 +288,27 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
             <h2 className="text-xl font-semibold text-center mb-6 text-gray-800">
               Level {selectedLevel} Conversation
             </h2>
-            
+
             {/* Animated Sphere */}
             <AnimatedSphere />
-            
+
             {/* Audio Input Indicator */}
             <AudioInputIndicator />
-            
+
             {/* Connection Status */}
-            <div className={`text-sm mb-6 ${conversation.status === 'connected' ? 'text-green-600' : 'text-red-500'}`}>
-              {conversation.status === 'connected' ? '🟢 Connected to Eleven Labs' : '🔴 Disconnected'}
+            <div
+              className={`text-sm mb-6 ${conversation.status === 'connected' ? 'text-green-600' : 'text-red-500'}`}
+            >
+              {conversation.status === 'connected'
+                ? '🟢 Connected to Eleven Labs'
+                : '🔴 Disconnected'}
             </div>
-            
+
             {/* AI Status */}
             {conversation.isSpeaking && (
-              <div className="text-sm mb-4 text-purple-600 font-medium">
-                🗣️ AI is speaking...
-              </div>
+              <div className="text-sm mb-4 text-purple-600 font-medium">🗣️ AI is speaking...</div>
             )}
-            
+
             {/* Controls */}
             <div className="flex space-x-4">
               <button
