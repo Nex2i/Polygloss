@@ -1,0 +1,29 @@
+{
+  "id": "beginner-family",
+  "title": "Family and Relationships",
+  "description": "Learn vocabulary about family members and describe relationships",
+  "skillLevel": 2,
+  "objectives": [
+    "Learn family member vocabulary",
+    "Describe family relationships",
+    "Use possessive adjectives"
+  ],
+  "activities": [
+    "Identify family members in photos",
+    "Create a family tree",
+    "Describe your family using new vocabulary"
+  ],
+  "duration": "45 minutes",
+  "vocabulary": [
+    "familia",
+    "padre",
+    "madre",
+    "hermano",
+    "hermana",
+    "abuelo",
+    "abuela",
+    "hijo",
+    "hija"
+  ],
+  "grammar": ["Possessive adjectives (mi, tu, su)", "Gender and number agreement"]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "elementary-present",
+  "title": "Present Tense Regular Verbs",
+  "description": "Master regular verb conjugations in present tense",
+  "skillLevel": 3,
+  "objectives": [
+    "Conjugate regular -ar, -er, -ir verbs",
+    "Form complete sentences in present tense",
+    "Express daily activities"
+  ],
+  "activities": [
+    "Conjugation practice exercises",
+    "Describe daily routines",
+    "Interview partner about their habits"
+  ],
+  "duration": "50 minutes",
+  "vocabulary": ["hablar", "comer", "vivir", "estudiar", "trabajar", "leer", "escribir", "caminar"],
+  "grammar": ["Present tense conjugations", "Subject-verb agreement", "Question formation"]
+}

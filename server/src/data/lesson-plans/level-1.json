@@ -1,0 +1,27 @@
+{
+  "id": "beginner-intro",
+  "title": "Introduction to Spanish - Basic Greetings",
+  "description": "Learn fundamental Spanish greetings and introductions",
+  "skillLevel": 1,
+  "objectives": [
+    "Learn basic greetings in Spanish",
+    "Practice introducing yourself",
+    "Understand formal vs informal greetings"
+  ],
+  "activities": [
+    "Listen and repeat common greetings",
+    "Practice introducing yourself with name and nationality",
+    "Role-play meeting someone new"
+  ],
+  "duration": "30 minutes",
+  "vocabulary": [
+    "hola",
+    "adiós",
+    "me llamo",
+    "soy de",
+    "mucho gusto",
+    "buenos días",
+    "buenas tardes"
+  ],
+  "grammar": ["Personal pronouns (yo, tú)", "Verb \"ser\" introduction"]
+}
