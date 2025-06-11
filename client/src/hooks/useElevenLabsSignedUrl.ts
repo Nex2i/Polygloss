@@ -15,10 +15,16 @@ interface SignedUrlResponse {
 }
 
 async function fetchSignedUrl(request: SignedUrlRequest): Promise<SignedUrlResponse> {
-  return apiClient<SignedUrlResponse>(`${API_BASE_URL}/api/elevenlabs/signed-url`, {
+  const result = await apiClient<SignedUrlResponse>(`${API_BASE_URL}/api/elevenlabs/signed-url`, {
     method: 'POST',
     body: JSON.stringify(request),
   });
+
+  if (!result) {
+    throw new Error('Failed to get signed URL: API returned null response');
+  }
+
+  return result;
 }
 
 export function useElevenLabsSignedUrl() {
