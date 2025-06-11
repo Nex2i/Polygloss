@@ -36,7 +36,7 @@ const ConversationScreen: React.FC<ConversationScreenProps> = ({
 
           {/* Connection Status */}
           <div className={`text-sm mb-4 ${isConnected ? 'text-green-600' : 'text-red-500'}`}>
-            {isConnected ? '🟢 Connected to Eleven Labs' : '🔴 Disconnected'}
+            {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
           </div>
         </div>
 

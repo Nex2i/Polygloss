@@ -157,7 +157,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
         },
       };
 
-      console.log('🚀 [CONNECTION] Session config with signed URL', sessionConfig);
+      console.log('🚀 [CONNECTION] Session config', sessionConfig);
 
       await conversation.startSession(sessionConfig);
     } catch (error) {
@@ -187,7 +187,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   };
 
   // Disconnect from Eleven Labs
-  const disconnect = useCallback(async () => {
+  const disconnect = async () => {
     try {
       await conversation.endSession();
     } catch (error) {
@@ -200,7 +200,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
     cleanupAudio();
     setConversationStarted(false);
-  }, [conversation, cleanupAudio, setConversationStarted]);
+  };
 
   // Cleanup on unmount
   useEffect(() => {
