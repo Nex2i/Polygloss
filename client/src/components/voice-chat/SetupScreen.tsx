@@ -13,8 +13,8 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
   onConnect,
   isConnecting,
 }) => {
-  // Generate lesson level options (1-10)
-  const lessonLevels = Array.from({ length: 10 }, (_, i) => i + 1);
+  // Generate lesson level options (1-5)
+  const lessonLevels = Array.from({ length: 5 }, (_, i) => i + 1);
 
   return (
     <div className="w-full max-w-none">
@@ -36,7 +36,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
             {lessonLevels.map((level) => (
               <option key={level} value={level}>
                 Level {level}{' '}
-                {level <= 3 ? '(Beginner)' : level <= 6 ? '(Intermediate)' : '(Advanced)'}
+                {level <= 2 ? '(Beginner)' : level <= 4 ? '(Intermediate)' : '(Advanced)'}
               </option>
             ))}
           </select>
