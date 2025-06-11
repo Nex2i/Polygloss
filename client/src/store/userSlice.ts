@@ -23,6 +23,11 @@ interface UserState {
   shouldLogout: boolean; // New flag to trigger logout
 }
 
+interface ApiError extends Error {
+  status?: number;
+  message: string;
+}
+
 const initialState: UserState = {
   user: null,
   supabaseUser: null,
@@ -32,10 +37,12 @@ const initialState: UserState = {
 };
 
 // Helper function to check if error is authentication-related
-const isAuthError = (error: any): boolean => {
+const isAuthError = (error: unknown): boolean => {
+  const apiError = error as ApiError;
+
   // Check for authentication-related HTTP status codes
   const authStatusCodes = [401, 403];
-  if (error?.status && authStatusCodes.includes(error.status)) {
+  if (apiError?.status && authStatusCodes.includes(apiError.status)) {
     return true;
   }
 
@@ -53,8 +60,8 @@ const isAuthError = (error: any): boolean => {
     return authErrorMessages.some((msg) => error.includes(msg));
   }
 
-  if (error?.message) {
-    return authErrorMessages.some((msg) => error.message.includes(msg));
+  if (apiError?.message) {
+    return authErrorMessages.some((msg) => apiError.message.includes(msg));
   }
 
   return false;
@@ -67,14 +74,15 @@ export const fetchCurrentUser = createAsyncThunk(
     try {
       const response = await apiClient.getCurrentUser();
       return response;
-    } catch (error: any) {
+    } catch (error) {
+      const apiError = error as ApiError;
       // Check if this is an authentication error
       if (isAuthError(error)) {
         // Trigger logout for authentication errors
         dispatch(forceLogout());
         return rejectWithValue('Authentication failed - user logged out');
       }
-      return rejectWithValue(error.message);
+      return rejectWithValue(apiError.message);
     }
   }
 );
@@ -94,8 +102,9 @@ export const createUser = createAsyncThunk(
     try {
       const response = await apiClient.createUser(userData);
       return { user: response.user, supabaseUser: null };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const apiError = error as ApiError;
+      return rejectWithValue(apiError.message);
     }
   }
 );

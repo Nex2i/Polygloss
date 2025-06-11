@@ -10,6 +10,10 @@ export const Route = createFileRoute('/login')({
   component: LoginPage,
 });
 
+interface ApiError extends Error {
+  message: string;
+}
+
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,8 +37,9 @@ function LoginPage() {
         // Try to fetch user from database, create if doesn't exist
         try {
           await apiClient.getCurrentUser();
-        } catch (userError: any) {
-          if (userError.message.includes('User not found in database')) {
+        } catch (userError) {
+          const apiError = userError as ApiError;
+          if (apiError.message.includes('User not found in database')) {
             // Create user in database if not exists
             try {
               await apiClient.createUser({
@@ -43,8 +48,9 @@ function LoginPage() {
                 name: data.user.user_metadata?.name || null,
                 avatar: data.user.user_metadata?.avatar_url || null,
               });
-            } catch (createError: any) {
-              console.warn('Failed to create user on login:', createError.message);
+            } catch (createError) {
+              const createApiError = createError as ApiError;
+              console.warn('Failed to create user on login:', createApiError.message);
             }
           }
         }

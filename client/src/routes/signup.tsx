@@ -10,6 +10,10 @@ export const Route = createFileRoute('/signup')({
   component: SignUpPage,
 });
 
+interface ApiError extends Error {
+  message: string;
+}
+
 function SignUpPage() {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
@@ -51,8 +55,9 @@ function SignUpPage() {
             name: firstName.trim() || undefined,
             avatar: data.user.user_metadata?.avatar_url || undefined,
           });
-        } catch (dbError: any) {
-          console.warn('Database user creation failed:', dbError.message);
+        } catch (dbError) {
+          const apiError = dbError as ApiError;
+          console.warn('Database user creation failed:', apiError.message);
           // Continue anyway, user will be created on first login if needed
         }
 

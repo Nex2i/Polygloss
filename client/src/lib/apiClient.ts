@@ -27,6 +27,12 @@ interface UserResponse {
   };
 }
 
+interface ApiError extends Error {
+  status?: number;
+  statusText?: string;
+  response?: unknown;
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -80,10 +86,10 @@ class ApiClient {
       });
 
       // Create error with additional context
-      const error = new Error(errorMessage);
-      (error as any).status = response.status;
-      (error as any).statusText = response.statusText;
-      (error as any).response = errorData;
+      const error = new Error(errorMessage) as ApiError;
+      error.status = response.status;
+      error.statusText = response.statusText;
+      error.response = errorData;
 
       throw error;
     }

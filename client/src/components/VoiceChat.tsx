@@ -6,6 +6,10 @@ import { useUser } from '../hooks/useUser';
 
 interface VoiceChatProps {}
 
+interface WindowWithWebkitAudioContext extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 const VoiceChat: React.FC<VoiceChatProps> = () => {
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
   const [audioLevel, setAudioLevel] = useState<number>(0);
@@ -45,91 +49,8 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     },
   });
 
-  // Handle page visibility changes to prevent disconnection when switching tabs
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      console.log(
-        '🔄 [VISIBILITY] Page visibility changed:',
-        document.hidden ? 'hidden' : 'visible'
-      );
-
-      if (audioContextRef.current && conversationStarted) {
-        if (document.hidden) {
-          // Tab is hidden - suspend audio context but keep conversation alive
-          if (audioContextRef.current.state === 'running') {
-            console.log('⏸️ [VISIBILITY] Suspending audio context');
-            try {
-              await audioContextRef.current.suspend();
-            } catch (error) {
-              console.warn('⚠️ [VISIBILITY] Failed to suspend audio context:', error);
-            }
-          }
-        } else {
-          // Tab is visible again - resume audio context
-          if (audioContextRef.current.state === 'suspended') {
-            console.log('▶️ [VISIBILITY] Resuming audio context');
-            try {
-              await audioContextRef.current.resume();
-              // Restart audio monitoring if it was stopped
-              if (!animationRef.current) {
-                monitorAudioLevel();
-              }
-            } catch (error) {
-              console.warn('⚠️ [VISIBILITY] Failed to resume audio context:', error);
-              // If resume fails, the context might be closed, so we don't restart monitoring
-            }
-          } else if (audioContextRef.current.state === 'closed') {
-            console.log('ℹ️ [VISIBILITY] Audio context is closed, cannot resume');
-          }
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [conversationStarted]);
-
-  // Initialize audio context for voice input detection
-  const initializeAudio = async () => {
-    try {
-      console.log('🎤 [AUDIO] Requesting microphone permission...');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log('🎤 [AUDIO] Microphone permission granted, stream:', stream);
-      console.log(
-        '🎤 [AUDIO] Stream tracks:',
-        stream.getTracks().map((track) => ({
-          kind: track.kind,
-          enabled: track.enabled,
-          readyState: track.readyState,
-        }))
-      );
-
-      // Store the media stream reference for cleanup
-      mediaStreamRef.current = stream;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-      source.connect(analyserRef.current);
-
-      monitorAudioLevel();
-    } catch (error) {
-      console.error('❌ [AUDIO] Error accessing microphone:', error);
-      if (error instanceof Error) {
-        console.error('❌ [AUDIO] Error name:', error.name);
-        console.error('❌ [AUDIO] Error message:', error.message);
-      }
-    }
-  };
-
   // Monitor audio input levels for visual feedback
-  const monitorAudioLevel = () => {
+  const monitorAudioLevel = useCallback(() => {
     if (!analyserRef.current) {
       console.log('📊 [AUDIO_MONITOR] No analyser available, returning');
       return;
@@ -182,6 +103,89 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
     updateAudioLevel();
     console.log('📊 [AUDIO_MONITOR] Audio monitoring started');
+  }, [conversation.status, setAudioLevel]);
+
+  // Handle page visibility changes to prevent disconnection when switching tabs
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      console.log(
+        '🔄 [VISIBILITY] Page visibility changed:',
+        document.hidden ? 'hidden' : 'visible'
+      );
+
+      if (audioContextRef.current && conversationStarted) {
+        if (document.hidden) {
+          // Tab is hidden - suspend audio context but keep conversation alive
+          if (audioContextRef.current.state === 'running') {
+            console.log('⏸️ [VISIBILITY] Suspending audio context');
+            try {
+              await audioContextRef.current.suspend();
+            } catch (error) {
+              console.warn('⚠️ [VISIBILITY] Failed to suspend audio context:', error);
+            }
+          }
+        } else {
+          // Tab is visible again - resume audio context
+          if (audioContextRef.current.state === 'suspended') {
+            console.log('▶️ [VISIBILITY] Resuming audio context');
+            try {
+              await audioContextRef.current.resume();
+              // Restart audio monitoring if it was stopped
+              if (!animationRef.current) {
+                monitorAudioLevel();
+              }
+            } catch (error) {
+              console.warn('⚠️ [VISIBILITY] Failed to resume audio context:', error);
+              // If resume fails, the context might be closed, so we don't restart monitoring
+            }
+          } else if (audioContextRef.current.state === 'closed') {
+            console.log('ℹ️ [VISIBILITY] Audio context is closed, cannot resume');
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [conversationStarted, monitorAudioLevel]);
+
+  // Initialize audio context for voice input detection
+  const initializeAudio = async () => {
+    try {
+      console.log('🎤 [AUDIO] Requesting microphone permission...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('🎤 [AUDIO] Microphone permission granted, stream:', stream);
+      console.log(
+        '🎤 [AUDIO] Stream tracks:',
+        stream.getTracks().map((track) => ({
+          kind: track.kind,
+          enabled: track.enabled,
+          readyState: track.readyState,
+        }))
+      );
+
+      // Store the media stream reference for cleanup
+      mediaStreamRef.current = stream;
+
+      const windowWithWebkit = window as WindowWithWebkitAudioContext;
+      audioContextRef.current = new (window.AudioContext || windowWithWebkit.webkitAudioContext)();
+
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      source.connect(analyserRef.current);
+
+      monitorAudioLevel();
+    } catch (error) {
+      console.error('❌ [AUDIO] Error accessing microphone:', error);
+      if (error instanceof Error) {
+        console.error('❌ [AUDIO] Error name:', error.name);
+        console.error('❌ [AUDIO] Error message:', error.message);
+      }
+    }
   };
 
   // Clean up audio context

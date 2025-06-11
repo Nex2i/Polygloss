@@ -4,15 +4,42 @@ import { apiClient } from '../lib/apiClient';
 import { useAppDispatch, useAppSelector } from '../store';
 import { fetchCurrentUser } from '../store/userSlice';
 
+interface DebugInfo {
+  supabaseSession?: {
+    exists: boolean;
+    user: {
+      id: string;
+      email: string | undefined;
+      emailConfirmed: boolean;
+    } | null;
+    accessToken: string;
+    error: string | null;
+  };
+  apiCall?: {
+    success: boolean;
+    data?: unknown;
+    error?: string;
+    status?: number;
+    response?: unknown;
+  };
+  reduxState?: unknown;
+  generalError?: string;
+}
+
+interface ApiError extends Error {
+  status?: number;
+  response?: unknown;
+}
+
 export function AuthDebugger() {
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user);
 
   const testAuth = async () => {
     setLoading(true);
-    const info: any = {};
+    const info: DebugInfo = {};
 
     try {
       // 1. Check Supabase session
@@ -40,12 +67,13 @@ export function AuthDebugger() {
           success: true,
           data: userResponse,
         };
-      } catch (apiError: any) {
+      } catch (apiError) {
+        const error = apiError as ApiError;
         info.apiCall = {
           success: false,
-          error: apiError.message,
-          status: apiError.status,
-          response: apiError.response,
+          error: error.message,
+          status: error.status,
+          response: error.response,
         };
       }
 
@@ -53,8 +81,9 @@ export function AuthDebugger() {
       info.reduxState = userState;
 
       setDebugInfo(info);
-    } catch (error: any) {
-      info.generalError = error.message;
+    } catch (error) {
+      const err = error as Error;
+      info.generalError = err.message;
       setDebugInfo(info);
     }
 
