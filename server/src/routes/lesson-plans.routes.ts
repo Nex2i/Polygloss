@@ -6,7 +6,7 @@ const basePath = '/lesson-plans';
 
 interface GetLessonPlanRequest {
   Querystring: {
-    skillLevel: number;
+    skill_level: number;
   };
 }
 
@@ -17,7 +17,7 @@ export default async function LessonPlans(fastify: FastifyInstance, _opts: Route
     url: `${basePath}`,
     handler: async (req: FastifyRequest<GetLessonPlanRequest>, reply: FastifyReply) => {
       try {
-        const { skillLevel } = req.query;
+        const { skill_level: skillLevel } = req.query;
 
         // Validate skill level
         if (!skillLevel || skillLevel < 1 || skillLevel > 10) {
@@ -62,10 +62,10 @@ export default async function LessonPlans(fastify: FastifyInstance, _opts: Route
       description: 'Retrieves a lesson plan based on the specified skill level (1-10).',
       querystring: {
         type: 'object',
-        required: ['skillLevel'],
+        required: ['skill_level'],
         properties: {
           skillLevel: {
-            type: 'number',
+            type: 'string',
             minimum: 1,
             maximum: 10,
             description:
