@@ -1,7 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import apiClient from '../lib/apiClient';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { apiClient } from '../lib/apiClient';
 
 interface SignedUrlRequest {
   lessonLevel?: number;
@@ -15,14 +13,10 @@ interface SignedUrlResponse {
 }
 
 async function fetchSignedUrl(request: SignedUrlRequest): Promise<SignedUrlResponse> {
-  const result = await apiClient<SignedUrlResponse>(`${API_BASE_URL}/api/elevenlabs/signed-url`, {
+  const result = await apiClient.makeRequest<SignedUrlResponse>('/elevenlabs/signed-url', {
     method: 'POST',
     body: JSON.stringify(request),
   });
-
-  if (!result) {
-    throw new Error('Failed to get signed URL: API returned null response');
-  }
 
   return result;
 }

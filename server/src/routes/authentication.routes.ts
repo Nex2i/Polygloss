@@ -1,8 +1,18 @@
 import { FastifyInstance, FastifyRequest, FastifyReply, RouteOptions } from 'fastify';
 import { HttpMethods } from '@/utils/HttpMethods';
 import { supabase } from '@/lib/supabaseClient'; // Import regular client
+import { UserService, CreateUserData } from '@/modules/user.service';
+import { Type } from '@sinclair/typebox';
 
 const basePath = '/auth';
+
+// Schema for create user endpoint
+const createUserBodySchema = Type.Object({
+  supabaseId: Type.String(),
+  email: Type.String({ format: 'email' }),
+  name: Type.Optional(Type.String()),
+  avatar: Type.Optional(Type.String()),
+});
 
 // Define schema for login if you were to implement it fully
 // const loginBodySchema = {
@@ -15,6 +25,96 @@ const basePath = '/auth';
 // } as const;
 
 export default async function Authentication(fastify: FastifyInstance, _opts: RouteOptions) {
+  // Create User route - Called after successful Supabase signup
+  fastify.route({
+    method: HttpMethods.POST,
+    url: `${basePath}/users`,
+    schema: {
+      body: createUserBodySchema,
+      tags: ['Authentication'],
+      summary: 'Create User',
+      description: 'Create a new user in the database after Supabase signup',
+    },
+    handler: async (request: FastifyRequest<{ Body: CreateUserData }>, reply: FastifyReply) => {
+      try {
+        const userData = request.body;
+        const user = await UserService.createUser(userData);
+        reply.status(201).send({
+          message: 'User created successfully',
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            avatar: user.avatar,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          },
+        });
+      } catch (error: any) {
+        fastify.log.error(`Error creating user: ${error.message}`);
+        reply.status(500).send({
+          message: 'Failed to create user',
+          error: error.message,
+        });
+      }
+    },
+  });
+
+  // Get Current User route - Called after successful login to fetch user data
+  fastify.route({
+    method: HttpMethods.GET,
+    url: `${basePath}/me`,
+    preHandler: [fastify.authPrehandler], // Ensures user is authenticated
+    schema: {
+      tags: ['Authentication'],
+      summary: 'Get Current User',
+      description: 'Get the current authenticated user data from database',
+    },
+    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        // The user object from Supabase is attached by the authPrehandler
+        const supabaseUser = (request as any).user;
+
+        if (!supabaseUser?.id) {
+          reply.status(401).send({ message: 'No authenticated user found' });
+          return;
+        }
+
+        // Fetch user from database using Supabase ID
+        const dbUser = await UserService.getUserBySupabaseId(supabaseUser.id);
+
+        if (!dbUser) {
+          reply.status(404).send({
+            message: 'User not found in database. Please complete signup process.',
+          });
+          return;
+        }
+
+        reply.send({
+          user: {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name,
+            avatar: dbUser.avatar,
+            createdAt: dbUser.createdAt,
+            updatedAt: dbUser.updatedAt,
+          },
+          supabaseUser: {
+            id: supabaseUser.id,
+            email: supabaseUser.email,
+            emailConfirmed: supabaseUser.email_confirmed_at !== null,
+          },
+        });
+      } catch (error: any) {
+        fastify.log.error(`Error fetching user: ${error.message}`);
+        reply.status(500).send({
+          message: 'Failed to fetch user data',
+          error: error.message,
+        });
+      }
+    },
+  });
+
   // Login route - Client should handle login directly with Supabase for this project.
   // This endpoint can be used if server-side login initiation is ever needed.
   fastify.route({

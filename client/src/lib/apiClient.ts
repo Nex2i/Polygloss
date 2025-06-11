@@ -4,56 +4,93 @@ interface RequestOptions extends RequestInit {
   // You can add custom options here if needed in the future
 }
 
-async function apiClient<T = unknown>(
-  url: string,
-  options: RequestOptions = {}
-): Promise<T | null> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const token = session?.access_token;
-
-  const headers = new Headers(options.headers || {});
-  if (token) {
-    headers.append('Authorization', `Bearer ${token}`);
-  }
-  // Add other default headers if necessary, e.g., Content-Type
-  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
-    headers.append('Content-Type', 'application/json');
-  }
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    // Attempt to parse error from response body
-    let errorData;
-    try {
-      errorData = await response.json();
-    } catch {
-      // Ignore if response is not JSON
-    }
-    throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-  }
-
-  // Handle cases where response might be empty (e.g., 204 No Content)
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return response.json() as Promise<T>;
-  }
-
-  // For 204 No Content, return null to indicate no content
-  if (response.status === 204) {
-    return null;
-  }
-
-  // For other non-JSON responses, throw an error since we can't provide T
-  throw new Error(`Expected JSON response but received ${contentType || 'unknown content type'}`);
+interface CreateUserData {
+  supabaseId: string;
+  email: string;
+  name?: string;
+  avatar?: string;
 }
 
-export default apiClient;
+interface UserResponse {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    avatar: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  supabaseUser?: {
+    id: string;
+    email: string;
+    emailConfirmed: boolean;
+  };
+}
+
+class ApiClient {
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8085/api';
+  }
+
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session?.access_token) {
+      return {
+        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      };
+    }
+
+    return {
+      'Content-Type': 'application/json',
+    };
+  }
+
+  private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    const headers = await this.getAuthHeaders();
+
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  // Public method for generic requests
+  async makeRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    return this.request<T>(endpoint, options);
+  }
+
+  // User-related methods
+  async createUser(
+    userData: CreateUserData
+  ): Promise<{ message: string; user: UserResponse['user'] }> {
+    return this.request('/auth/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async getCurrentUser(): Promise<UserResponse> {
+    return this.request('/auth/me');
+  }
+}
+
+export const apiClient = new ApiClient();
 
 // Example Usage (not part of the file content, just for illustration):
 /*

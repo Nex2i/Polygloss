@@ -1,15 +1,20 @@
-import { useEffect, useState } from 'react';
-import { createRootRoute, Outlet, useRouter, Link, useNavigate } from '@tanstack/react-router';
-import { supabase } from '../lib/supabaseClient'; // Adjusted path
+import { useState, useEffect } from 'react';
+import { Link, Outlet, createRootRoute, useRouter, useNavigate } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { supabase } from '../lib/supabaseClient';
 import type { Session } from '@supabase/supabase-js';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchCurrentUser, clearUser } from '../store/userSlice';
 
 export const Route = createRootRoute({
-  component: RootComponent,
+  component: () => <RootComponent />,
 });
 
 function RootComponent() {
   const router = useRouter();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { user: dbUser, loading: userLoading } = useAppSelector((state) => state.user);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,26 +25,32 @@ function RootComponent() {
       } = await supabase.auth.getSession();
       setSession(currentSession);
       setLoading(false);
+
+      // If user is authenticated, fetch user data from database
+      if (currentSession?.user) {
+        dispatch(fetchCurrentUser());
+      }
     };
 
     getSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       setSession(newSession);
-      // If user logs out, newSession will be null.
-      // If user logs in, newSession will be populated.
+
       if (_event === 'SIGNED_OUT' && newSession === null) {
+        // Clear user data from Redux store
+        dispatch(clearUser());
         navigate({ to: '/auth', search: { redirect: '/dashboard' }, replace: true });
       } else if (_event === 'SIGNED_IN' && newSession !== null) {
-        // Optionally navigate to dashboard on sign in if not already there
-        // However, individual components (like AuthPage) might handle this better
+        // Fetch user data from database
+        dispatch(fetchCurrentUser());
       }
     });
 
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   useEffect(() => {
     if (!loading) {
@@ -67,11 +78,11 @@ function RootComponent() {
       console.error('Error logging out:', error);
       // Optionally show an error to the user
     } else {
-      // onAuthStateChange will handle redirect to /auth
+      // onAuthStateChange will handle redirect to /auth and clearing user data
     }
   };
 
-  if (loading) {
+  if (loading || userLoading) {
     // You can replace this with a proper loading spinner component
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
@@ -89,7 +100,9 @@ function RootComponent() {
               Dashboard
             </Link>
             <div>
-              <span className="mr-4">Welcome, {session?.user?.email}</span>
+              <span className="mr-4">
+                Welcome, {dbUser?.name || dbUser?.email || session?.user?.email}
+              </span>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -103,6 +116,7 @@ function RootComponent() {
       <div className="w-screen max-w-[100vw] h-screen max-h-[100vh] overflow-hidden">
         <Outlet />
       </div>
+      <TanStackRouterDevtools />
     </>
   );
 }

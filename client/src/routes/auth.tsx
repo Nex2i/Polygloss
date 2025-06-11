@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createFileRoute, useRouter, useSearch } from '@tanstack/react-router';
 import { supabase } from '../lib/supabaseClient'; // Adjusted path
+import { apiClient } from '../lib/apiClient';
 
 export const Route = createFileRoute('/auth')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -34,6 +35,19 @@ function AuthPage() {
 
       // Check if user is successfully created
       if (data.user) {
+        try {
+          // Create user in database
+          await apiClient.createUser({
+            supabaseId: data.user.id,
+            email: data.user.email || email,
+            name: data.user.user_metadata?.name || null,
+            avatar: data.user.user_metadata?.avatar_url || null,
+          });
+        } catch (dbError: any) {
+          console.warn('Database user creation failed:', dbError.message);
+          // Continue anyway, user will be created on first login
+        }
+
         // If a session exists, email confirmation is not required
         if (data.session) {
           // User is automatically signed in, navigate to redirect
@@ -57,14 +71,32 @@ function AuthPage() {
     setLoading(true);
     setError(null);
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
         setError(signInError.message);
-      } else {
+      } else if (data.user) {
+        // Try to fetch user from database, create if doesn't exist
+        try {
+          await apiClient.getCurrentUser();
+        } catch (userError: any) {
+          if (userError.message.includes('User not found in database')) {
+            // Create user in database if not exists
+            try {
+              await apiClient.createUser({
+                supabaseId: data.user.id,
+                email: data.user.email || email,
+                name: data.user.user_metadata?.name || null,
+                avatar: data.user.user_metadata?.avatar_url || null,
+              });
+            } catch (createError: any) {
+              console.warn('Failed to create user on login:', createError.message);
+            }
+          }
+        }
         router.navigate({ to: redirect });
       }
     } catch (e: unknown) {
