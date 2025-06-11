@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY; // Or SUPABASE_SERVICE_KEY if you choose to use it
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -13,12 +13,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Note: For server-side operations, especially those requiring admin privileges
-// or bypassing RLS (Row Level Security), you would typically use the service_role key.
-// For simple token verification (auth.getUser(token)), the anon key is often sufficient
-// if your RLS policies allow it or if you're not interacting with data that RLS protects.
-// If you encounter permission issues with RLS, consider using the service_role key.
-// const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-// export const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+// Regular client for all operations
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

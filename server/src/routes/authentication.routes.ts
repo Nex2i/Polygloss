@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply, RouteOptions } from 'fastify';
 import { HttpMethods } from '@/utils/HttpMethods';
-import { supabase } from '@/lib/supabaseClient'; // Import server-side Supabase client
+import { supabase } from '@/lib/supabaseClient'; // Import regular client
 
 const basePath = '/auth';
 
@@ -65,15 +65,22 @@ export default async function Authentication(fastify: FastifyInstance, _opts: Ro
       }
 
       try {
-        // For server-side logout, we need to use the admin API to sign out the user's session
-        // The token represents the user's JWT that we need to invalidate
-        const { error } = await supabase.auth.admin.signOut(token);
-        if (error) {
-          fastify.log.error(`Supabase admin signOut error: ${error.message}`);
-          reply.status(500).send({ message: 'Logout failed', error: error.message });
+        // Verify the token is valid by getting the user
+        const {
+          data: { user },
+          error: getUserError,
+        } = await supabase.auth.getUser(token);
+
+        if (getUserError || !user) {
+          fastify.log.error(`Error getting user from token: ${getUserError?.message}`);
+          reply.status(401).send({ message: 'Invalid token' });
           return;
         }
-        reply.send({ message: 'Logout successful' });
+
+        // For client-side authentication, we don't need to invalidate the token server-side
+        // The client should remove the token from storage upon receiving this response
+        // The token will naturally expire based on its TTL
+        reply.send({ message: 'Logout successful. Please remove token from client storage.' });
       } catch (error: any) {
         fastify.log.error(`Server error during logout: ${error.message}`);
         reply
