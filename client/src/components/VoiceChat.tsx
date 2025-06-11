@@ -13,6 +13,7 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationRef = useRef<number | undefined>(undefined);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   // Hook for getting signed URL from authenticated endpoint
   const signedUrlMutation = useElevenLabsSignedUrl();
@@ -40,6 +41,53 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     },
   });
 
+  // Handle page visibility changes to prevent disconnection when switching tabs
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      console.log(
+        '🔄 [VISIBILITY] Page visibility changed:',
+        document.hidden ? 'hidden' : 'visible'
+      );
+
+      if (audioContextRef.current && conversationStarted) {
+        if (document.hidden) {
+          // Tab is hidden - suspend audio context but keep conversation alive
+          if (audioContextRef.current.state === 'running') {
+            console.log('⏸️ [VISIBILITY] Suspending audio context');
+            try {
+              await audioContextRef.current.suspend();
+            } catch (error) {
+              console.warn('⚠️ [VISIBILITY] Failed to suspend audio context:', error);
+            }
+          }
+        } else {
+          // Tab is visible again - resume audio context
+          if (audioContextRef.current.state === 'suspended') {
+            console.log('▶️ [VISIBILITY] Resuming audio context');
+            try {
+              await audioContextRef.current.resume();
+              // Restart audio monitoring if it was stopped
+              if (!animationRef.current) {
+                monitorAudioLevel();
+              }
+            } catch (error) {
+              console.warn('⚠️ [VISIBILITY] Failed to resume audio context:', error);
+              // If resume fails, the context might be closed, so we don't restart monitoring
+            }
+          } else if (audioContextRef.current.state === 'closed') {
+            console.log('ℹ️ [VISIBILITY] Audio context is closed, cannot resume');
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [conversationStarted]);
+
   // Initialize audio context for voice input detection
   const initializeAudio = async () => {
     try {
@@ -54,6 +102,9 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
           readyState: track.readyState,
         }))
       );
+
+      // Store the media stream reference for cleanup
+      mediaStreamRef.current = stream;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -83,14 +134,31 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
 
     const updateAudioLevel = () => {
-      if (analyserRef.current && conversation.status === 'connected') {
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        setAudioLevel(average);
-        // Only log every 60 frames to avoid spam
-        if (Math.random() < 0.01) {
-          // ~1% of the time
-          console.log('📊 [AUDIO_MONITOR] Audio level:', average, 'Status:', conversation.status);
+      if (analyserRef.current && conversation.status === 'connected' && audioContextRef.current) {
+        // Only update if audio context is running and tab is visible
+        if (audioContextRef.current.state === 'running' && !document.hidden) {
+          analyserRef.current.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          setAudioLevel(average);
+          // Only log every 60 frames to avoid spam
+          if (Math.random() < 0.01) {
+            // ~1% of the time
+            console.log('📊 [AUDIO_MONITOR] Audio level:', average, 'Status:', conversation.status);
+          }
+        } else {
+          // Set audio level to 0 when context is suspended or tab is hidden
+          setAudioLevel(0);
+          if (Math.random() < 0.01) {
+            // ~1% of the time
+            console.log(
+              '📊 [AUDIO_MONITOR] Skipping update - context state:',
+              audioContextRef.current?.state,
+              'tab hidden:',
+              document.hidden,
+              'status:',
+              conversation.status
+            );
+          }
         }
       } else {
         if (Math.random() < 0.01) {
@@ -99,7 +167,9 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
             '📊 [AUDIO_MONITOR] Skipping update - analyser:',
             !!analyserRef.current,
             'status:',
-            conversation.status
+            conversation.status,
+            'audioContext:',
+            !!audioContextRef.current
           );
         }
       }
@@ -112,13 +182,28 @@ const VoiceChat: React.FC<VoiceChatProps> = () => {
 
   // Clean up audio context
   const cleanupAudio = useCallback(() => {
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
+    console.log('🧹 [CLEANUP] Starting audio cleanup');
 
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+      animationRef.current = undefined;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => {
+        track.stop();
+        console.log('🧹 [CLEANUP] Stopped media stream track:', track.kind);
+      });
+      mediaStreamRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      console.log(
+        '🧹 [CLEANUP] Closing audio context, current state:',
+        audioContextRef.current.state
+      );
+      audioContextRef.current.close();
+      audioContextRef.current = null;
     }
 
     setAudioLevel(0);
