@@ -4,7 +4,10 @@ interface RequestOptions extends RequestInit {
   // You can add custom options here if needed in the future
 }
 
-async function apiClient<T = unknown>(url: string, options: RequestOptions = {}): Promise<T> {
+async function apiClient<T = unknown>(
+  url: string,
+  options: RequestOptions = {}
+): Promise<T | null> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -41,9 +44,9 @@ async function apiClient<T = unknown>(url: string, options: RequestOptions = {})
     return response.json() as Promise<T>;
   }
 
-  // For 204 No Content, return empty object as T
+  // For 204 No Content, return null to indicate no content
   if (response.status === 204) {
-    return {} as T;
+    return null;
   }
 
   // For other non-JSON responses, throw an error since we can't provide T

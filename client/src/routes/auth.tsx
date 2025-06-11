@@ -32,31 +32,20 @@ function AuthPage() {
         return;
       }
 
-      // Check if user is successfully created,
-      // Supabase might send back a user object with null session if email confirmation is required.
-      // For this basic setup, we'll assume direct login or handle email confirmation separately if needed.
+      // Check if user is successfully created
       if (data.user) {
-        // If email confirmation is not required by your Supabase settings,
-        // data.session will likely be null after signUp.
-        // You might need to signIn the user explicitly or rely on onAuthStateChange
-        // For now, let's try to sign in immediately after successful sign up for simplicity
-        // or inform the user to check their email if confirmation is enabled.
-
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (signInError) {
-          setError(signInError.message);
-        } else {
+        // If a session exists, email confirmation is not required
+        if (data.session) {
+          // User is automatically signed in, navigate to redirect
           router.navigate({ to: redirect });
+        } else {
+          // No session means email confirmation is required
+          setError(
+            'Sign up successful! Please check your email to confirm your account, then return to sign in.'
+          );
         }
       } else {
-        // This case might occur if email confirmation is pending
-        setError(
-          'Sign up successful. Please check your email to confirm your account if required, then try signing in.'
-        );
+        setError('Sign up failed. Please try again.');
       }
     } catch (e: unknown) {
       setError((e as Error).message || 'An unexpected error occurred during sign up.');
