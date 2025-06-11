@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="90" fill="#4F46E5" stroke="#3730A3" stroke-width="4"/>
+  
+  <!-- Speech bubble 1 -->
+  <circle cx="72" cy="72" r="24" fill="#FFFFFF" opacity="0.95"/>
+  <polygon points="72,96 60,108 84,108" fill="#FFFFFF" opacity="0.95"/>
+  
+  <!-- Speech bubble 2 -->
+  <circle cx="132" cy="108" r="18" fill="#F59E0B" opacity="0.95"/>
+  <polygon points="132,126 123,138 141,138" fill="#F59E0B" opacity="0.95"/>
+  
+  <!-- Text elements representing different languages -->
+  <text x="72" y="84" font-family="Arial, sans-serif" font-size="24" fill="#4F46E5" font-weight="bold" text-anchor="middle">A</text>
+  <text x="132" y="120" font-family="Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="bold" text-anchor="middle">ñ</text>
+  
+  <!-- Microphone icon -->
+  <rect x="90" y="144" width="12" height="24" rx="6" fill="#FFFFFF"/>
+  <rect x="84" y="132" width="24" height="18" rx="9" fill="#FFFFFF"/>
+  <line x1="96" y1="168" x2="96" y2="180" stroke="#FFFFFF" stroke-width="6"/>
+  <line x1="84" y1="180" x2="108" y2="180" stroke="#FFFFFF" stroke-width="6"/>
+</svg> 

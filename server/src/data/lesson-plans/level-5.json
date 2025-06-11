@@ -1,0 +1,19 @@
+{
+  "id": "intermediate-subjunctive",
+  "title": "Introduction to Subjunctive Mood",
+  "description": "Begin using subjunctive for expressing doubt, emotion, and desire",
+  "skillLevel": 5,
+  "objectives": [
+    "Understand subjunctive mood concept",
+    "Use subjunctive with expressions of emotion",
+    "Form present subjunctive of regular verbs"
+  ],
+  "activities": [
+    "Identify subjunctive triggers",
+    "Complete sentences with appropriate mood",
+    "Express hopes and fears"
+  ],
+  "duration": "2 minutes",
+  "vocabulary": ["esperar que", "temer que", "alegrarse de que", "es importante que", "ojalá"],
+  "grammar": ["Present subjunctive formation", "Subjunctive triggers", "Indicative vs subjunctive"]
+}

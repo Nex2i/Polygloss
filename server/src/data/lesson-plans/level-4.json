@@ -1,0 +1,19 @@
+{
+  "id": "elementary-past",
+  "title": "Past Tense (Preterite) Introduction",
+  "description": "Learn to express past actions using preterite tense",
+  "skillLevel": 4,
+  "objectives": [
+    "Understand preterite tense usage",
+    "Conjugate regular verbs in preterite",
+    "Tell stories about past events"
+  ],
+  "activities": [
+    "Timeline creation of past events",
+    "Story completion exercises",
+    "Share what you did yesterday"
+  ],
+  "duration": "2 minutes",
+  "vocabulary": ["ayer", "anoche", "el fin de semana pasado", "la semana pasada", "el año pasado"],
+  "grammar": ["Preterite tense formation", "Time expressions for past", "Regular preterite endings"]
+}

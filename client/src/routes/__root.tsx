@@ -15,7 +15,9 @@ function RootComponent() {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession();
       setSession(currentSession);
       setLoading(false);
     };
@@ -94,7 +96,9 @@ function RootComponent() {
           </div>
         </nav>
       )}
-      <div className={`m-2 sm:m-4 md:m-8 ${showNav ? 'pt-16' : ''}`}> {/* Adjust padding if nav is fixed */}
+      <div className={`m-2 sm:m-4 md:m-8 ${showNav ? 'pt-16' : ''}`}>
+        {' '}
+        {/* Adjust padding if nav is fixed */}
         <Outlet />
       </div>
     </>
